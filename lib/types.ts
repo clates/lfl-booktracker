@@ -21,5 +21,5 @@ export type Sighting = {
 export type GenerateBookCodeRequest = {
   title: string;
   author: string;
-  location: { lat: string; long: string };
+  location: { lat: string | number; long: string | number };
 }

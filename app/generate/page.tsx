@@ -14,9 +14,12 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { GenerateBookCodeRequest } from "@/lib/types";
 import { useToast } from "@/hooks/use-toast";
+import useLocation from "@/hooks/use-location";
+import { OpenLibraryDoc } from "@/lib/openLibrary";
+import AutoCompleteResults from "@/components/autoCompleteResults";
 
 const formSchema = z.object({
   location: z.string().min(2, "Location must be at least 2 characters"),
@@ -24,21 +27,62 @@ const formSchema = z.object({
   title: z.string().min(2, "Title must be at least 2 characters"),
   lat: z.string().min(2, "Title must be at least 2 characters"),
   long: z.string().min(2, "Title must be at least 2 characters"),
+  isbn: z.string().min(2, "ISBN must be at least 8 characters"),
 });
 
 export default function GeneratePage() {
   const [generatedCode, setGeneratedCode] = useState<string>("");
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
+  const { latitude, longitude, error } = useLocation();
+  const [titleInput, setTitleInput] = useState<string>("");
+  const [isbnInput, setIsbnInput] = useState<string>("");
+  const [titleResults, setTitleResults] = useState<any[]>([]);
+
+  /**
+   * AutoComplete when typing in the title field.
+   * This will fetch results from the OpenLibrary API and display them in a list.
+   */
+  useEffect(() => {
+    const fetchResults = async () => {
+      let searchCriteria = "";
+      if (titleInput.length >= 6) {
+        searchCriteria = `title=${titleInput}*`;
+      } else if (isbnInput.length >= 8) {
+        searchCriteria = `isbn=${isbnInput}*`;
+      }
+      try {
+        const response = await fetch(
+          `https://openlibrary.org/search.json?${searchCriteria}&fields=title,author_name,cover_i,isbn,ratings_count,cover_edition_key&limit=20`
+        );
+        const data: { docs: OpenLibraryDoc[] } = await response.json();
+        setTitleResults(
+          data.docs.sort((a, b) => a.ratings_count - b.ratings_count) || []
+        );
+      } catch (fetchError) {
+        console.error("Error fetching data:", fetchError);
+      }
+    };
+
+    // Debounce the API call by setting a timer
+    const debounceTimer = setTimeout(() => {
+      if (titleInput.length >= 6 || isbnInput.length >= 8) {
+        // Adjust this condition as needed
+        fetchResults();
+      } else {
+        setTitleResults([]);
+      }
+    }, 300); // Delay in milliseconds
+
+    return () => clearTimeout(debounceTimer); // Cleanup the timer
+  }, [titleInput, isbnInput]);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      location: "",
       author: "",
       title: "",
-      lat: "",
-      long: "",
+      isbn: "",
     },
   });
 
@@ -53,7 +97,10 @@ export default function GeneratePage() {
         body: JSON.stringify({
           title: values.title,
           author: values.author,
-          location: { lat: values.lat, long: values.long },
+          location: {
+            lat: latitude ? latitude : 0,
+            long: longitude ? longitude : 0,
+          },
         } as GenerateBookCodeRequest),
       });
 
@@ -97,38 +144,25 @@ export default function GeneratePage() {
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
               <FormField
                 control={form.control}
-                name="location"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Location</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Enter location" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="author"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Author</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Enter author" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
                 name="title"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Title</FormLabel>
                     <FormControl>
-                      <Input placeholder="Enter title" {...field} />
+                      <div>
+                        <Input
+                          placeholder="Enter title"
+                          {...field}
+                          onChange={(e) => {
+                            setTitleInput(e.target.value);
+                            field.onChange(e);
+                          }}
+                        />
+                        <AutoCompleteResults
+                          results={titleInput ? titleResults : []}
+                          onClick={console.log}
+                        />
+                      </div>
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -136,25 +170,25 @@ export default function GeneratePage() {
               />
               <FormField
                 control={form.control}
-                name="lat"
+                name="isbn"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Lat</FormLabel>
+                    <FormLabel>ISBN</FormLabel>
                     <FormControl>
-                      <Input placeholder="Enter lat" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="long"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Long</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Enter long" {...field} />
+                      <div>
+                        <Input
+                          placeholder="Enter ISBN"
+                          {...field}
+                          onChange={(e) => {
+                            setIsbnInput(e.target.value);
+                            field.onChange(e);
+                          }}
+                        />
+                        <AutoCompleteResults
+                          results={isbnInput ? titleResults : []}
+                          onClick={console.log}
+                        />
+                      </div>
                     </FormControl>
                     <FormMessage />
                   </FormItem>
