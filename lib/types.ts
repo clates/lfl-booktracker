@@ -1,3 +1,5 @@
+import { OpenLibraryDoc } from "./openLibrary";
+
 export type Book = {
   id: string;
   code: string;
@@ -19,7 +21,6 @@ export type Sighting = {
 };
 
 export type GenerateBookCodeRequest = {
-  title: string;
-  author: string;
+  book: OpenLibraryDoc;
   location: { lat: string | number; long: string | number };
 }

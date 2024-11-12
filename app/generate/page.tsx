@@ -18,8 +18,9 @@ import { useEffect, useState } from "react";
 import { GenerateBookCodeRequest } from "@/lib/types";
 import { useToast } from "@/hooks/use-toast";
 import useLocation from "@/hooks/use-location";
-import { OpenLibraryDoc } from "@/lib/openLibrary";
+import { OpenLibraryDoc, getBookCover } from "@/lib/openLibrary";
 import AutoCompleteResults from "@/components/autoCompleteResults";
+import { Accordion } from "@/components/ui/accordion";
 
 const formSchema = z.object({
   location: z.string().min(2, "Location must be at least 2 characters"),
@@ -38,6 +39,7 @@ export default function GeneratePage() {
   const [titleInput, setTitleInput] = useState<string>("");
   const [isbnInput, setIsbnInput] = useState<string>("");
   const [titleResults, setTitleResults] = useState<any[]>([]);
+  const [selectedBook, setSelectedBook] = useState<OpenLibraryDoc | null>(null);
 
   /**
    * AutoComplete when typing in the title field.
@@ -86,7 +88,7 @@ export default function GeneratePage() {
     },
   });
 
-  async function onSubmit(values: z.infer<typeof formSchema>) {
+  async function onSubmit() {
     setIsLoading(true);
     try {
       const response = await fetch("/api/books/generate", {
@@ -95,8 +97,7 @@ export default function GeneratePage() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          title: values.title,
-          author: values.author,
+          book: selectedBook,
           location: {
             lat: latitude ? latitude : 0,
             long: longitude ? longitude : 0,
@@ -127,15 +128,15 @@ export default function GeneratePage() {
 
   // Format the code into ###-###-### format
   function formatCode(code: string) {
-    return `${code.slice(0, 3)}-${code.slice(3, 6)}-${code.slice(
+    return `${code.slice(0, 4)}-${code.slice(4, 6)}-${code.slice(
       6,
       9
     )}`.toUpperCase();
   }
 
   return (
-    <div className="max-w-2xl mx-auto">
-      <Card>
+    <div className="max-w-2xl mx-auto ">
+      <Card className="bg-accent">
         <CardHeader>
           <CardTitle>Generate Book Code</CardTitle>
         </CardHeader>
@@ -157,10 +158,16 @@ export default function GeneratePage() {
                             setTitleInput(e.target.value);
                             field.onChange(e);
                           }}
+                          onFocus={(e) => {
+                            setTitleInput(e.target.value);
+                          }}
                         />
                         <AutoCompleteResults
                           results={titleInput ? titleResults : []}
-                          onClick={console.log}
+                          onSelect={(book) => {
+                            setTitleResults([]);
+                            setSelectedBook(book);
+                          }}
                         />
                       </div>
                     </FormControl>
@@ -183,10 +190,16 @@ export default function GeneratePage() {
                             setIsbnInput(e.target.value);
                             field.onChange(e);
                           }}
+                          onFocus={(e) => {
+                            setTitleInput(e.target.value);
+                          }}
                         />
                         <AutoCompleteResults
                           results={isbnInput ? titleResults : []}
-                          onClick={console.log}
+                          onSelect={(book) => {
+                            setTitleResults([]);
+                            setSelectedBook(book);
+                          }}
                         />
                       </div>
                     </FormControl>
@@ -194,24 +207,59 @@ export default function GeneratePage() {
                   </FormItem>
                 )}
               />
-              <Button type="submit" className="w-full">
-                Generate Code
-              </Button>
             </form>
           </Form>
-
-          {generatedCode && (
-            <div className="mt-6 p-4 bg-muted rounded-lg">
-              <p className="text-sm font-medium text-muted-foreground mb-2">
-                Generated Code:
-              </p>
-              <p className="text-3xl font-mono text-center">
-                {formatCode(generatedCode)}
-              </p>
-            </div>
-          )}
         </CardContent>
       </Card>
+      {selectedBook && (
+        <Card className="bg-accent mt-6">
+          <CardHeader>
+            <CardTitle>Selected Book</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex flex-col gap-3">
+              <div className="flex flex-row justify-around gap-1">
+                <div className="flex flex-col gap-1">
+                  <h3 className="text-lg text-accent-foreground">
+                    {selectedBook.title}
+                  </h3>
+                  <p className="text-md text-muted-foreground">
+                    {selectedBook.author_name?.join(", ")}
+                  </p>
+
+                  {selectedBook.isbn && (
+                    <p className="text-md text-muted-foreground">
+                      ISBN: {selectedBook.isbn[0]}
+                    </p>
+                  )}
+                </div>
+                {
+                  // Display the book cover
+                  selectedBook.cover_edition_key && (
+                    <img
+                      src={getBookCover(selectedBook)}
+                      className="w-40 h-40"
+                    />
+                  )
+                }
+              </div>
+              <Button type="submit" onClick={onSubmit} className="w-full">
+                Generate Code
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+      {generatedCode && (
+        <div className="mt-6 p-4 bg-muted rounded-lg">
+          <p className="text-sm font-medium text-muted-foreground mb-2">
+            Generated Code:
+          </p>
+          <p className="text-3xl font-mono text-center">
+            {formatCode(generatedCode)}
+          </p>
+        </div>
+      )}
     </div>
   );
 }

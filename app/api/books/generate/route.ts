@@ -12,8 +12,6 @@ const LENGTH = 5;
 export async function POST(request: Request) {
   try {
     const {
-      title,
-      author,
       location: { lat, long },
     } = await request.json();
     const locationString = `${lat},${long}`;
