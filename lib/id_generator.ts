@@ -1,7 +1,7 @@
 import { supabase } from "./supabase";
 import { encodeGeoHash, BASE32 } from "./geohash";
 
-// Constants for encryption
+// Constants for obfuscation
 // Coprime to 32768 (2^15)
 const PRIME = 20219;
 // XOR Mask

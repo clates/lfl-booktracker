@@ -41,5 +41,27 @@ The implementation uses a Modular Affine Cipher: `(x * P) ^ K`.
 - **XOR Key (K)**: Can be any value, used for obfuscation.
 - **Reversibility**: Since P is coprime to the modulus size (powers of 2), the function is a permutation in that domain, guaranteeing no collisions for unique counters within the range.
 
-### 2.3 Limits
-- **Max Safe Integer**: JS `Number.MAX_SAFE_INTEGER` (2^53 - 1) is significantly larger than the 20-bit logic (2^20). Code handles larger numbers by default, but suffix length logic would need extension if counters exceed ~1 million per 1km grid square (highly unlikely).
+### 2.3 Limits and Overflow Safety
+- **Max Safe Integer**: JS `Number.MAX_SAFE_INTEGER` (2^53 - 1) is significantly larger than the 20-bit logic (2^20).
+- **Intermediate Overflow**: The PR review noted a concern about `counter * PRIME_20` overflowing 20 bits. 
+    - **Analysis**: `1,048,575 (20-bit max) * 486187 (PRIME) ≈ 5.09 * 10^11`. This is well within the Javascript Safe Integer limit (9 * 10^15) and 32-bit Bitwise operation limit (2^31 - 1 for signed, 2^32 for unsigned >>>).  
+    - **Bitwise Truncation**: JS bitwise operators (`&`) implicitly convert operands to 32-bit integers. Since our max valid product fits in 40 bits (worst case) but our typical product fits in 39 bits? Actually `5 * 10^11` is approx `2^39`. 
+    - **Correction**: `5 * 10^11` exceeds 32 bits (`4.29 * 10^9`). 
+        - **Behavior**: JS `&` operator truncates the high bits.
+        - **Impact**: We implicitly compute `(counter * PRIME) % 2^32` then `& 0xFFFFF` (mod 2^20).
+        - **validity**: As long as the mapping remains bijective in the 20-bit domain, the loss of high bits strictly due to 32-bit truncation behaves as an additional modulo step. 
+        - **Verification**: `(x * P) mod 2^20` is the intended operation. `((x * P) mod 2^32) mod 2^20` is mathematically equivalent to `(x * P) mod 2^20`. Thus, **Logic is Safe**.
+
+### 2.4 Input Normalization (`lib/geohash.ts`)
+- **Function**: `normalizeGeoHash`
+- **Mapping**:
+    - `O` -> `0` (Zero)
+    - `I` / `L` -> `1` (One)
+    - All other non-alphanumeric removed.
+- **Rationale**: Crockford Base32 excludes I/L/O to avoid visual confusion. This function allows users to type them safely by mapping to their visual lookalikes.
+
+## 3. Security Boundaries
+- **Access Control**: `grid_counters` table has RLS enabled.
+- **Write Access**: No `INSERT` or `UPDATE` policies exist for users.
+- **Implicit Deny**: Postgres RLS denies all operations not explicitly permitted. Thus, users **cannot** bypass the `increment_counter` RPC to modify the table directly.
+
