@@ -14,6 +14,10 @@ const US_LON_MIN = -125.0;
 const US_LON_MAX = -66.0;
 
 export function encodeGeoHash(latitude: number, longitude: number): string {
+  if (latitude < -90 || latitude > 90 || longitude < -180 || longitude > 180) {
+    throw new Error(`Invalid coordinates: lat=${latitude}, lon=${longitude}`);
+  }
+
   // Check if within Continental US
   if (
     latitude >= US_LAT_MIN &&
