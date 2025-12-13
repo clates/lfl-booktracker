@@ -113,12 +113,12 @@ export default function GeneratePage() {
       setGeneratedCode(code);
       toast({
         title: "Success",
-        description: "Hit recorded successfully",
+        description: "ID Generated Successfully",
       });
     } catch (error) {
       toast({
         title: "Error",
-        description: "Failed to record hit. Please try again.",
+        description: "Failed to generate ID. Please try again.",
         variant: "destructive",
       });
     } finally {
