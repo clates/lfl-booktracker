@@ -76,3 +76,17 @@ Follow these steps to set up the project locally.
 ## License
 
 [MIT](LICENSE)
+
+## Testing
+
+This project uses [Jest](https://jestjs.io/) for unit testing.
+
+To run the test suite:
+
+```bash
+npm run test
+# or
+yarn test
+```
+
+Tests are located in the `__tests__` directory and mirror the project structure.
