@@ -51,33 +51,33 @@ function encode(
   maxLon: number,
   precision: number
 ): string {
-  let is_even = true;
-  let lat_interval = [minLat, maxLat];
-  let lon_interval = [minLon, maxLon];
+  let isEven = true;
+  let latInterval = [minLat, maxLat];
+  let lonInterval = [minLon, maxLon];
   let bit = 0;
   let ch = 0;
   let geohash = "";
 
   while (geohash.length < precision) {
-    if (is_even) {
-      const mid = (lon_interval[0] + lon_interval[1]) / 2;
+    if (isEven) {
+      const mid = (lonInterval[0] + lonInterval[1]) / 2;
       if (longitude > mid) {
         ch |= BITS[bit];
-        lon_interval[0] = mid;
+        lonInterval[0] = mid;
       } else {
-        lon_interval[1] = mid;
+        lonInterval[1] = mid;
       }
     } else {
-      const mid = (lat_interval[0] + lat_interval[1]) / 2;
+      const mid = (latInterval[0] + latInterval[1]) / 2;
       if (latitude > mid) {
         ch |= BITS[bit];
-        lat_interval[0] = mid;
+        latInterval[0] = mid;
       } else {
-        lat_interval[1] = mid;
+        latInterval[1] = mid;
       }
     }
 
-    is_even = !is_even;
+    isEven = !isEven;
     if (bit < 4) {
       bit++;
     } else {
