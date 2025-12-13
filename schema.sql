@@ -53,6 +53,7 @@ CREATE POLICY "Enable read access for all users" ON public.grid_counters FOR SEL
 CREATE OR REPLACE FUNCTION public.increment_counter(prefix_in TEXT)
 RETURNS INTEGER
 LANGUAGE plpgsql
+SECURITY DEFINER
 AS $$
 DECLARE
     new_value INTEGER;
