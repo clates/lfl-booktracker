@@ -19,7 +19,7 @@ export async function POST(request: Request) {
     }
 
     const { data, error } = await supabase
-      .from('sighting')
+      .from('sightings')
       .insert({
         book_id: bookId,
         user_id: user.id,
