@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase';
 
+export const dynamic = 'force-dynamic';
+
 
 // export async function generateStaticParams() {
 //   const { data: codes, error } = await supabase.from('books').select('code');
