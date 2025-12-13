@@ -1,37 +1,59 @@
-import { decodeGeoHash, encodeGeoHash } from '@/lib/geohash';
+import { encodeGeoHash, normalizeGeoHash } from '@/lib/geohash';
 
 describe('geohash utility', () => {
   describe('encodeGeoHash', () => {
-    it('encodes a coordinate within the hardcoded bounds', () => {
-      // Bounds in code: lat 25-50, lon -125 to -65
+    it('encodes a coordinate within US bounds (5 chars, no W)', () => {
+      // US Bounds: 24-50, -125 to -66
       const lat = 37.7749; // San Francisco
       const lon = -122.4194;
       
       const hash = encodeGeoHash(lat, lon);
-      expect(typeof hash).toBe('string');
-      expect(hash.length).toBe(12);
+      expect(hash.length).toBe(5);
+      expect(hash.startsWith('W')).toBe(false);
     });
 
-    it('generates consistent hashes', () => {
-      const lat = 40.7128; // New York
-      const lon = -74.0060;
-      const hash1 = encodeGeoHash(lat, lon);
-      const hash2 = encodeGeoHash(lat, lon);
-      expect(hash1).toBe(hash2);
+    it('encodes a coordinate outside US bounds (W + 4 chars)', () => {
+      // London (Outside US)
+      const lat = 51.5074;
+      const lon = -0.1278;
+      
+      const hash = encodeGeoHash(lat, lon);
+      expect(hash.length).toBe(5); // W + 4
+      expect(hash.startsWith('W')).toBe(true);
+    });
+
+    it('throws error for invalid coordinates', () => {
+      expect(() => encodeGeoHash(91, 0)).toThrow('Invalid coordinates');
+      expect(() => encodeGeoHash(0, -181)).toThrow('Invalid coordinates');
+    });
+
+    it('handles US boundary conditions correctly', () => {
+      // Exact US Bottom-Left: 24.0, -125.0
+      expect(encodeGeoHash(24.0, -125.0).startsWith('W')).toBe(false);
+      
+      // Just Outside US Bottom-Left: 23.99, -125.0
+      expect(encodeGeoHash(23.99, -125.0).startsWith('W')).toBe(true);
     });
   });
 
-  describe('decodeGeoHash', () => {
-    it('decodes a standard geohash correctly', () => {
-      // "9q8yy" is a standard geohash. 
-      // 9q8yy centers at roughly 37.75, -122.45 (San Francisco)
-      
-      const hash = '9q8yy';
-      const result = decodeGeoHash(hash);
-      
-      // Standard decoding should give us coordinates back
-      expect(result.latitude[2]).toBeCloseTo(37.76, 1);
-      expect(result.longitude[2]).toBeCloseTo(-122.44, 1);
+  describe('normalizeGeoHash', () => {
+    it('normalizes O to 0', () => {
+      expect(normalizeGeoHash('W0RD')).toBe('W0RD');
+      expect(normalizeGeoHash('WORD')).toBe('W0RD');
+    });
+
+    it('normalizes I and L to 1', () => {
+      expect(normalizeGeoHash('L1FE')).toBe('11FE');
+      expect(normalizeGeoHash('I1FE')).toBe('11FE');
+    });
+
+    it('removes non-alphanumeric characters', () => {
+      expect(normalizeGeoHash('A-B-C')).toBe('ABC');
+      expect(normalizeGeoHash('A B C')).toBe('ABC');
+    });
+
+    it('converts to uppercase', () => {
+      expect(normalizeGeoHash('abc')).toBe('ABC');
     });
   });
 });

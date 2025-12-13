@@ -36,8 +36,8 @@ describe('GET /api/books/[id]', () => {
     });
 
     const request = {} as Request;
-    // Note: The code uses params.code but directory is [id]. We test the function logic.
-    const params = { code: 'MISSING' }; 
+    // Note: The code uses params.id (from [id] directory)
+    const params = { id: 'MISSING' }; 
 
     const response = await GET(request, { params: params as any });
     const data = await response.json();
@@ -77,7 +77,7 @@ describe('GET /api/books/[id]', () => {
     });
 
     const request = {} as Request;
-    const params = { code: 'EXISTING' };
+    const params = { id: 'EXISTING' };
 
     const response = await GET(request, { params: params as any });
     const data = await response.json();
@@ -100,7 +100,7 @@ describe('GET /api/books/[id]', () => {
     });
 
     const request = {} as Request;
-    const params = { code: 'ERROR' };
+    const params = { id: 'ERROR' };
 
     const response = await GET(request, { params: params as any });
     
