@@ -33,3 +33,39 @@ CREATE POLICY "Enable insert for authenticated users only" ON public.books FOR I
 
 CREATE POLICY "Enable read access for all users" ON public.sightings FOR SELECT USING (true);
 CREATE POLICY "Enable insert for authenticated users only" ON public.sightings FOR INSERT WITH CHECK (auth.role() = 'authenticated');
+
+-- Grid Counters Table
+CREATE TABLE public.grid_counters (
+    prefix text NOT NULL,
+    counter integer DEFAULT 0 NOT NULL,
+    updated_at timestamp with time zone DEFAULT timezone('utc'::text, now()) NOT NULL,
+    CONSTRAINT grid_counters_pkey PRIMARY KEY (prefix)
+);
+
+ALTER TABLE public.grid_counters ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Enable read access for all users" ON public.grid_counters FOR SELECT USING (true);
+-- Note: Insert/Update is handled via RPC, security definer function recommended if we want to restrict direct table access, 
+-- but for now we'll allow authenticated users to potentially read. 
+-- Writing should be done via the function to ensure atomicity.
+
+-- Atomic Increment Function
+CREATE OR REPLACE FUNCTION public.increment_counter(prefix_in TEXT)
+RETURNS INTEGER
+LANGUAGE plpgsql
+SECURITY DEFINER
+AS $$
+DECLARE
+    new_value INTEGER;
+BEGIN
+    INSERT INTO public.grid_counters (prefix, counter)
+    VALUES (prefix_in, 1)
+    ON CONFLICT (prefix)
+    DO UPDATE SET 
+        counter = grid_counters.counter + 1,
+        updated_at = now()
+    RETURNING counter INTO new_value;
+    
+    RETURN new_value;
+END;
+$$;

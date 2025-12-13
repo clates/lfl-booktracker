@@ -2,20 +2,21 @@ import { NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase';
 
 
-export async function generateStaticParams() {
-  const { data: codes, error } = await supabase.from('books').select('code');
-  if (error) throw error;
-  return codes.map((code) => ({ slug: code }));
-}
+// export async function generateStaticParams() {
+//   const { data: codes, error } = await supabase.from('books').select('code');
+//   if (error) throw error;
+//   return codes.map((code) => ({ id: code.code }));
+// }
+
 export async function GET(
   request: Request,
-  { params }: { params: { code: string } }
+  { params }: any
 ) {
   try {
     const { data: book, error: bookError } = await supabase
       .from('books')
       .select('*')
-      .eq('code', params.code.toUpperCase())
+      .eq('code', params.id.toUpperCase())
       .single();
 
     if (bookError) throw bookError;
