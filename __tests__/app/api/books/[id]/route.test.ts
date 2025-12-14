@@ -92,6 +92,9 @@ describe('GET /api/books/[id]', () => {
   });
 
   it('returns 500 on database error', async () => {
+    // Suppress console.error
+    const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+
      // Mock error
     const mockSelect = jest.fn().mockReturnThis();
     const mockEq = jest.fn().mockReturnThis();
@@ -109,5 +112,8 @@ describe('GET /api/books/[id]', () => {
     const response = await GET(request, { params: params as any });
     
     expect(response.status).toBe(500);
+    expect(consoleSpy).toHaveBeenCalledWith('Error fetching book:', expect.anything());
+
+    consoleSpy.mockRestore();
   });
 });
