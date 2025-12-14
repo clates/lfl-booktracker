@@ -39,3 +39,7 @@ export function Navigation() {
     </header>
   );
 }
+
+function eventsWithSession(event: string) {
+  return event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED' || event === 'INITIAL_SESSION';
+}

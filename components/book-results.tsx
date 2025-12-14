@@ -93,7 +93,7 @@ export function BookResults({ book, sightings: initialSightings }: BookResultsPr
             <TableBody>
               {sightings.map((hit) => (
                 <TableRow key={hit.id}>
-                  <TableCell>{hit.user.email}</TableCell>
+                  <TableCell>{hit.user?.email || 'Anonymous'}</TableCell>
                   <TableCell>{hit.location}</TableCell>
                   <TableCell>
                     {format(new Date(hit.created_at), 'PPp')}

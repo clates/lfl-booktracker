@@ -1,4 +1,4 @@
-import { supabase } from "./supabase";
+import { supabase } from './supabase-admin';
 import { encodeGeoHash, BASE32 } from "./geohash";
 
 // Constants for obfuscation

@@ -1,12 +1,16 @@
 import { GET } from '@/app/api/books/[id]/route';
-import { supabase } from '@/lib/supabase';
-import { NextResponse } from 'next/server';
 
-// Mock Supabase
-jest.mock('@/lib/supabase', () => ({
-  supabase: {
-    from: jest.fn(),
-  },
+// Mock Supabase and Next.js headers
+const mockSupabase = {
+  from: jest.fn(),
+};
+
+jest.mock('@supabase/auth-helpers-nextjs', () => ({
+  createRouteHandlerClient: jest.fn(() => mockSupabase),
+}));
+
+jest.mock('next/headers', () => ({
+  cookies: jest.fn(),
 }));
 
 // Mock NextResponse
@@ -17,7 +21,7 @@ jest.mock('next/server', () => ({
 }));
 
 describe('GET /api/books/[id]', () => {
-  const mockFrom = supabase.from as jest.Mock;
+  const mockFrom = mockSupabase.from as jest.Mock;
 
   beforeEach(() => {
     jest.clearAllMocks();
