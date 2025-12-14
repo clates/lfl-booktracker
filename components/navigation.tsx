@@ -76,7 +76,7 @@ export function Navigation() {
               </Button>
             </div>
           ) : (
-             <Button
+            <Button
               variant={pathname === '/login' ? 'default' : 'ghost'}
               asChild
             >
