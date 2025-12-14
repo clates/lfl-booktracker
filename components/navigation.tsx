@@ -13,9 +13,10 @@ export function Navigation() {
   const pathname = usePathname();
   const router = useRouter();
   const [user, setUser] = useState<SupabaseUser | null>(null);
-  const supabase = createClientComponentClient();
 
   useEffect(() => {
+    const supabase = createClientComponentClient();
+    
     const getUser = async () => {
       const { data: { session } } = await supabase.auth.getSession();
       setUser(session?.user ?? null);
@@ -28,9 +29,10 @@ export function Navigation() {
     });
 
     return () => subscription.unsubscribe();
-  }, [supabase]);
+  }, []);
 
   const handleSignOut = async () => {
+    const supabase = createClientComponentClient();
     await supabase.auth.signOut();
     router.refresh();
     toast.success('Signed out successfully');
