@@ -123,19 +123,19 @@ export function AuthForm() {
         </div>
 
         <div className="grid grid-cols-2 gap-4">
-          <Button variant="outline" onClick={() => handleSocialAuth('google')} type="button">
+          <Button variant="outline" aria-label="Sign in with Google" onClick={() => handleSocialAuth('google')} type="button">
             <GoogleIcon className="mr-2 h-4 w-4" />
             Google
           </Button>
-          <Button variant="outline" onClick={() => handleSocialAuth('github')} type="button">
+          <Button variant="outline" aria-label="Sign in with GitHub" onClick={() => handleSocialAuth('github')} type="button">
             <Github className="mr-2 h-4 w-4" />
             GitHub
           </Button>
-          <Button variant="outline" onClick={() => handleSocialAuth('twitter')} type="button">
+          <Button variant="outline" aria-label="Sign in with Twitter" onClick={() => handleSocialAuth('twitter')} type="button">
             <Twitter className="mr-2 h-4 w-4" />
             Twitter
           </Button>
-          <Button variant="outline" onClick={() => handleSocialAuth('instagram')} type="button">
+          <Button variant="outline" aria-label="Sign in with Instagram" onClick={() => handleSocialAuth('instagram')} type="button">
             <Instagram className="mr-2 h-4 w-4" />
             Instagram
           </Button>
