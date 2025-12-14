@@ -1,12 +1,16 @@
 import { GET } from '@/app/api/books/[id]/route';
-import { supabase } from '@/lib/supabase';
-import { NextResponse } from 'next/server';
 
-// Mock Supabase
-jest.mock('@/lib/supabase', () => ({
-  supabase: {
-    from: jest.fn(),
-  },
+// Mock Supabase and Next.js headers
+const mockSupabase = {
+  from: jest.fn(),
+};
+
+jest.mock('@supabase/auth-helpers-nextjs', () => ({
+  createRouteHandlerClient: jest.fn(() => mockSupabase),
+}));
+
+jest.mock('next/headers', () => ({
+  cookies: jest.fn(),
 }));
 
 // Mock NextResponse
@@ -17,7 +21,7 @@ jest.mock('next/server', () => ({
 }));
 
 describe('GET /api/books/[id]', () => {
-  const mockFrom = supabase.from as jest.Mock;
+  const mockFrom = mockSupabase.from as jest.Mock;
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -88,6 +92,9 @@ describe('GET /api/books/[id]', () => {
   });
 
   it('returns 500 on database error', async () => {
+    // Suppress console.error
+    const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+
      // Mock error
     const mockSelect = jest.fn().mockReturnThis();
     const mockEq = jest.fn().mockReturnThis();
@@ -105,5 +112,8 @@ describe('GET /api/books/[id]', () => {
     const response = await GET(request, { params: params as any });
     
     expect(response.status).toBe(500);
+    expect(consoleSpy).toHaveBeenCalledWith('Error fetching book:', expect.anything());
+
+    consoleSpy.mockRestore();
   });
 });

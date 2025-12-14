@@ -1,32 +1,29 @@
 import { NextResponse } from 'next/server';
-import { supabase } from '@/lib/supabase';
+import { adminSupabase } from '@/lib/supabase-admin';
 
 
 export async function generateStaticParams() {
-  const { data: ids, error } = await supabase.from('sightings').select('id');
-  if (error) throw error;
-  return ids.map((id) => ({ slug: id }));
+  const { data: sightings } = await adminSupabase.from('sightings').select('id');
+  return sightings?.map(({ id }) => ({ id })) || [];
 }
-export async function GET(
-  request: Request,
-  { params }: { params: { code: string } }
-) {
-  try {
-    const { data: sighting, error: bookError } = await supabase
-      .from('sightings')
-      .select('*')
-      .eq('id', params.code.toUpperCase())
-      .single();
 
-    if (bookError) throw bookError;
+export async function GET(request: Request, { params }: { params: { id: string } }) {
+  try {
+    const { data: sighting, error } = await adminSupabase
+        .from('sightings')
+        .select('*, book:books(*)')
+        .eq('id', params.id)
+        .single();
+
+    if (error) throw error;
     if (!sighting) {
-      return NextResponse.json({ error: 'Sighting not found' }, { status: 404 });
+        return NextResponse.json({ error: 'Sighting not found' }, { status: 404 });
     }
     return NextResponse.json(sighting);
   } catch (error) {
     console.error('Error fetching sighting:', error);
     return NextResponse.json(
-      { error: 'Failed to fetch book data' },
+      { error: 'Failed to fetch sighting' },
       { status: 500 }
     );
   }

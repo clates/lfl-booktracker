@@ -88,9 +88,25 @@ export default function GeneratePage() {
     },
   });
 
+  // Helper to get cookie
+  function getCookie(name: string) {
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) return parts.pop()?.split(';').shift();
+  }
+
+  useEffect(() => {
+    if (!getCookie("lfl_anonymous_id")) {
+      const newId = crypto.randomUUID();
+      // Set cookie for 1 year
+      document.cookie = `lfl_anonymous_id=${newId}; path=/; max-age=31536000; SameSite=Lax; Secure`;
+    }
+  }, []);
+
   async function onSubmit() {
     setIsLoading(true);
     try {
+      const anonymousId = getCookie("lfl_anonymous_id");
       const response = await fetch("/api/books/generate", {
         method: "POST",
         headers: {
@@ -102,6 +118,7 @@ export default function GeneratePage() {
             lat: latitude ? latitude : 0,
             long: longitude ? longitude : 0,
           },
+          anonymousId,
         } as GenerateBookCodeRequest),
       });
 

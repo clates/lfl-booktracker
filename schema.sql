@@ -7,7 +7,11 @@ CREATE TABLE public.books (
     code text NOT NULL,
     title text NOT NULL,
     author text NOT NULL,
+    isbn text,
+    cover_url text,
     location text NOT NULL,
+    lat double precision,
+    lon double precision,
     created_at timestamp with time zone DEFAULT timezone('utc'::text, now()) NOT NULL,
     CONSTRAINT books_pkey PRIMARY KEY (id),
     CONSTRAINT books_code_key UNIQUE (code)
@@ -17,11 +21,16 @@ CREATE TABLE public.books (
 CREATE TABLE public.sightings (
     id uuid DEFAULT uuid_generate_v4() NOT NULL,
     book_id uuid NOT NULL,
-    user_id uuid NOT NULL,
+    user_id uuid,
+    anonymous_id uuid,
     location text NOT NULL,
+    lat double precision,
+    lon double precision,
+    sighting_type text DEFAULT 'REGISTER',
     created_at timestamp with time zone DEFAULT timezone('utc'::text, now()) NOT NULL,
     CONSTRAINT sightings_pkey PRIMARY KEY (id),
-    CONSTRAINT sightings_book_id_fkey FOREIGN KEY (book_id) REFERENCES public.books (id)
+    CONSTRAINT sightings_book_id_fkey FOREIGN KEY (book_id) REFERENCES public.books (id),
+    CONSTRAINT sightings_type_check CHECK (sighting_type IN ('REGISTER', 'SIGHTING', 'CLAIM'))
 );
 
 -- RLS Policies (Standard setup for Supabase)
