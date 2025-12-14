@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Github, Twitter, Instagram, Mail } from 'lucide-react';
+import { Github, Twitter, Instagram } from 'lucide-react';
 import { toast } from 'sonner';
 
 // Custom icons for Google which might not be in Lucide
