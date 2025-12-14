@@ -23,9 +23,10 @@ export default async function RootLayout({
   children: React.ReactNode;
 }) {
   const cookieStore = cookies();
+  // Ensure we use the ANON key for client operations to respect RLS
   const supabase = createServerComponentClient({ cookies: () => cookieStore }, {
     supabaseUrl: process.env.NEXT_PUBLIC_SUPABASE_URL,
-    supabaseKey: process.env.DB_KEY
+    supabaseKey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
   });
   const {
     data: { session },

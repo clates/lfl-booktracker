@@ -1,18 +1,7 @@
-import { createClient } from "@supabase/supabase-js";
+import { adminSupabase } from './supabase-admin';
 
 export async function claimSightings(userId: string, anonymousId: string) {
-  // Use DB_KEY to bypass RLS and update 'anonymous' rows
-  
-  const adminSupabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.DB_KEY!,
-    {
-      auth: {
-        persistSession: false,
-        autoRefreshToken: false,
-      },
-    }
-  );
+  // Use centralized Admin Client to bypass RLS and update 'anonymous' rows
 
   try {
     const { error, count } = await adminSupabase

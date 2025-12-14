@@ -1,4 +1,4 @@
-import { supabase } from './supabase-admin';
+import { adminSupabase } from './supabase-admin';
 import { encodeGeoHash, BASE32 } from "./geohash";
 
 // Constants for obfuscation
@@ -45,7 +45,7 @@ export async function generateBookId(lat: number, lon: number): Promise<string> 
   const prefix = encodeGeoHash(lat, lon);
 
   // 2. Get Atomic Counter from DB
-  const { data, error } = await supabase.rpc("increment_counter", {
+  const { data: counter, error } = await adminSupabase.rpc("increment_counter", {
     prefix_in: prefix,
   });
 
@@ -54,10 +54,8 @@ export async function generateBookId(lat: number, lon: number): Promise<string> 
     throw new Error("Failed to generate Book ID");
   }
 
-  const counter = data as number;
-
   // 3. Generate Suffix
-  const suffix = generateSuffix(counter);
+  const suffix = generateSuffix(counter as number);
 
   // 4. Combine
   return `${prefix}-${suffix}`;

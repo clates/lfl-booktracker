@@ -1,3 +1,4 @@
+import { adminSupabase } from '@/lib/supabase-admin';
 import { NextResponse } from 'next/server';
 import { generateBookId } from "@/lib/id_generator";
 import { createRouteHandlerClient } from "@supabase/auth-helpers-nextjs";
@@ -16,14 +17,13 @@ export async function POST(request: Request) {
       anonymousId
     } = body;
 
-    // 1. Get authenticated user (if any)
+    // 1. Check user session (optional but good context)
+    // Use defaults (implicitly uses NEXT_PUBLIC_SUPABASE_ANON_KEY)
     const cookieStore = cookies();
-    const supabase = createRouteHandlerClient({ cookies: () => cookieStore }, {
-      supabaseUrl: process.env.NEXT_PUBLIC_SUPABASE_URL,
-      supabaseKey: process.env.DB_KEY
-    });
+    const supabase = createRouteHandlerClient({ cookies: () => cookieStore });
     const { data: { session } } = await supabase.auth.getSession();
-    const user_id = session?.user?.id || null;
+
+    const userId = session?.user?.id || null;
 
     // 2. Generate Code
     const code = await generateBookId(lat, long);
@@ -47,37 +47,39 @@ export async function POST(request: Request) {
     const isbn = typedBook?.isbn ? typedBook.isbn[0] : null;
 
     // 5. Persist Book
-    const { data: bookData, error: bookError } = await adminSupabase
+    const { data, error } = await adminSupabase
       .from("books")
       .insert({
         code,
+        lat,
+        lon: long,
         title: typedBook?.title || "Unknown Title",
         author: typedBook?.author_name?.[0] || "Unknown Author",
         isbn: isbn,
         cover_url: cover_url,
-        location: `${lat},${long}`, // Simple string representation
-        lat: lat,
-        lon: long
+        location: `${lat},${long}` 
       })
-      .select("id")
+      .select()
       .single();
 
-    if (bookError) {
-      console.error("Error inserting book:", bookError);
-      throw new Error("Failed to persist book");
+    if (error) {
+      console.error("Error creating book:", error);
+      return NextResponse.json({ error: "Failed to generate book" }, { status: 500 });
     }
 
-    // 6. Persist Sighting
+    // 4. Create Initial Sighting
     const { error: sightingError } = await adminSupabase
       .from("sightings")
       .insert({
-        book_id: bookData.id,
-        user_id: user_id,
-        anonymous_id: user_id ? null : anonymousId, // Only store anon ID if not logged in
-        location: `${lat},${long}`,
-        lat: lat,
+        book_id: data.id,
+        lat,
         lon: long,
-        sighting_type: 'REGISTER'
+        location: `${lat},${long}`,
+        sighting_type: 'REGISTER',
+        // If user is logged in, associate with them. Otherwise anonymous.
+        user_id: userId,
+        // If anonymous (no user_id), store the anonymousId to link later
+        anonymous_id: userId ? null : anonymousId
       });
       
     if (sightingError) {

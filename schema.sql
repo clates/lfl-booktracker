@@ -29,7 +29,8 @@ CREATE TABLE public.sightings (
     sighting_type text DEFAULT 'REGISTER',
     created_at timestamp with time zone DEFAULT timezone('utc'::text, now()) NOT NULL,
     CONSTRAINT sightings_pkey PRIMARY KEY (id),
-    CONSTRAINT sightings_book_id_fkey FOREIGN KEY (book_id) REFERENCES public.books (id)
+    CONSTRAINT sightings_book_id_fkey FOREIGN KEY (book_id) REFERENCES public.books (id),
+    CONSTRAINT sightings_type_check CHECK (sighting_type IN ('REGISTER', 'SIGHTING', 'CLAIM'))
 );
 
 -- RLS Policies (Standard setup for Supabase)
