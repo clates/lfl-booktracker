@@ -71,7 +71,7 @@ export function Navigation() {
                 {user.email}
               </span>
               <Button variant="ghost" size="icon" onClick={handleSignOut} title="Sign Out">
-                 <LogOut className="h-4 w-4" />
+                <LogOut className="h-4 w-4" />
               </Button>
             </div>
           ) : (
