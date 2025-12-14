@@ -16,20 +16,30 @@ jest.mock('next/headers', () => ({
 
 jest.mock('next/server', () => {
   const actualModule = jest.requireActual('next/server');
+  
+  // Create a custom Response class that properly supports the url property
+  class MockNextResponse extends global.Response {
+    constructor(body, init = {}) {
+      super(body, init);
+      // Store the redirect URL if provided
+      if (init.url) {
+        this.url = init.url;
+      }
+    }
+    
+    static redirect(url, init) {
+      return new MockNextResponse(null, {
+        ...init,
+        status: 307,
+        headers: { Location: url },
+        url: url, // Explicitly set the url property
+      });
+    }
+  }
+  
   return {
     ...actualModule,
-    NextResponse: {
-      ...actualModule.NextResponse,
-      redirect: jest.fn((url) => {
-        // Create a proper response-like object with url property
-        const response = new global.Response(null, {
-          status: 307,
-          headers: { Location: url }
-        });
-        response.url = url;
-        return response;
-      }),
-    },
+    NextResponse: MockNextResponse,
   };
 });
 

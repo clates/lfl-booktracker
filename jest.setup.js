@@ -30,7 +30,13 @@ if (typeof global.Headers === 'undefined') {
     }
     append(name, value) {
       const existing = this._headers.get(name);
-      if (existing) {
+      // Set-Cookie headers should not be concatenated
+      if (name.toLowerCase() === 'set-cookie') {
+        // For set-cookie, store as array
+        const cookies = existing ? (Array.isArray(existing) ? existing : [existing]) : [];
+        cookies.push(value);
+        this._headers.set(name, cookies);
+      } else if (existing) {
         this._headers.set(name, `${existing}, ${value}`);
       } else {
         this._headers.set(name, value);
@@ -53,7 +59,8 @@ if (typeof global.Headers === 'undefined') {
     getSetCookie() {
       // Return array of set-cookie values
       const setCookie = this._headers.get('set-cookie');
-      return setCookie ? [setCookie] : [];
+      if (!setCookie) return [];
+      return Array.isArray(setCookie) ? setCookie : [setCookie];
     }
   };
 }
