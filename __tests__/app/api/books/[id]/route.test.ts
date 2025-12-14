@@ -1,3 +1,6 @@
+/**
+ * @jest-environment node
+ */
 import { GET } from '@/app/api/books/[id]/route';
 
 // Mock Supabase and Next.js headers
@@ -41,7 +44,7 @@ describe('GET /api/books/[id]', () => {
 
     const request = {} as Request;
     // Note: The code uses params.id (from [id] directory)
-    const params = { id: 'MISSING' }; 
+    const params = { id: 'MISSING' };
 
     const response = await GET(request, { params: params as any });
     const data = await response.json();
@@ -58,8 +61,8 @@ describe('GET /api/books/[id]', () => {
     const mockBookSingle = jest.fn().mockResolvedValue({ data: mockBook, error: null });
     const mockBookEq = jest.fn().mockReturnThis();
     const mockBookSelect = jest.fn().mockReturnValue({
-        eq: mockBookEq,
-        single: mockBookSingle
+      eq: mockBookEq,
+      single: mockBookSingle
     });
 
     // Chain for sightings
@@ -71,13 +74,13 @@ describe('GET /api/books/[id]', () => {
     // Assuming first call is for 'books', second for 'sightings'
     // But mocked 'from' needs to return different things based on argument
     mockFrom.mockImplementation((table: string) => {
-        if (table === 'books') {
-            return { select: mockBookSelect };
-        }
-        if (table === 'sightings') {
-            return { select: mockSightingsSelect };
-        }
-        return { select: jest.fn() };
+      if (table === 'books') {
+        return { select: mockBookSelect };
+      }
+      if (table === 'sightings') {
+        return { select: mockSightingsSelect };
+      }
+      return { select: jest.fn() };
     });
 
     const request = {} as Request;
@@ -93,9 +96,9 @@ describe('GET /api/books/[id]', () => {
 
   it('returns 500 on database error', async () => {
     // Suppress console.error
-    const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+    const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => { });
 
-     // Mock error
+    // Mock error
     const mockSelect = jest.fn().mockReturnThis();
     const mockEq = jest.fn().mockReturnThis();
     const mockSingle = jest.fn().mockResolvedValue({ data: null, error: { message: 'DB Error' } });
@@ -110,7 +113,7 @@ describe('GET /api/books/[id]', () => {
     const params = { id: 'ERROR' };
 
     const response = await GET(request, { params: params as any });
-    
+
     expect(response.status).toBe(500);
     expect(consoleSpy).toHaveBeenCalledWith('Error fetching book:', expect.anything());
 
