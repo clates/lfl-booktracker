@@ -5,7 +5,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { BookOpen, PlusCircle, LogIn, LogOut } from 'lucide-react';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import type { User as SupabaseUser } from '@supabase/supabase-js';
 import { toast } from 'sonner';
 
@@ -13,7 +13,7 @@ export function Navigation() {
   const pathname = usePathname();
   const router = useRouter();
   const [user, setUser] = useState<SupabaseUser | null>(null);
-  const supabase = createClientComponentClient();
+  const supabase = useMemo(() => createClientComponentClient(), []);
 
   useEffect(() => {
     const getUser = async () => {
