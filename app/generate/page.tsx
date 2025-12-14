@@ -99,7 +99,7 @@ export default function GeneratePage() {
     if (!getCookie("lfl_anonymous_id")) {
       const newId = crypto.randomUUID();
       // Set cookie for 1 year
-      document.cookie = `lfl_anonymous_id=${newId}; path=/; max-age=31536000; SameSite=Lax`;
+      document.cookie = `lfl_anonymous_id=${newId}; path=/; max-age=31536000; SameSite=Lax; Secure`;
     }
   }, []);
 

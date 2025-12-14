@@ -22,7 +22,8 @@ export default async function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const supabase = createServerComponentClient({ cookies }, {
+  const cookieStore = cookies();
+  const supabase = createServerComponentClient({ cookies: () => cookieStore }, {
     supabaseUrl: process.env.NEXT_PUBLIC_SUPABASE_URL,
     supabaseKey: process.env.DB_KEY
   });
@@ -30,7 +31,6 @@ export default async function RootLayout({
     data: { session },
   } = await supabase.auth.getSession();
   
-  const cookieStore = cookies();
   const anonymousId = cookieStore.get('lfl_anonymous_id')?.value;
 
   if (session?.user?.id && anonymousId) {

@@ -1,4 +1,3 @@
-import { supabase } from '@/lib/supabase-admin';
 import { NextResponse } from 'next/server';
 import { generateBookId } from "@/lib/id_generator";
 import { createRouteHandlerClient } from "@supabase/auth-helpers-nextjs";
@@ -30,24 +29,15 @@ export async function POST(request: Request) {
     const code = await generateBookId(lat, long);
 
     // 3. Initialize Admin Client for persistence (bypassing RLS for anonymous inserts)
-    // Note: This requires SUPABASE_SERVICE_ROLE_KEY or DB_KEY in .env.local
-    const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.DB_KEY;
-    if (!serviceRoleKey) {
-      console.error("Missing SUPABASE_SERVICE_ROLE_KEY or DB_KEY");
-      // Fallback or error? For now, we error because we need to persist.
-      return NextResponse.json(
-        { error: "Server configuration error" },
-        { status: 500 }
-      );
-    }
+    // Use DB_KEY as the service role key
     const adminSupabase = createClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      serviceRoleKey,
+      process.env.DB_KEY!,
       {
         auth: {
           persistSession: false,
           autoRefreshToken: false,
-        }
+        },
       }
     );
 

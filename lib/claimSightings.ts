@@ -1,17 +1,11 @@
 import { createClient } from "@supabase/supabase-js";
 
 export async function claimSightings(userId: string, anonymousId: string) {
-  // Use Service Role Key to bypass RLS and update 'anonymous' rows
-  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.DB_KEY;
+  // Use DB_KEY to bypass RLS and update 'anonymous' rows
   
-  if (!serviceRoleKey) {
-    console.error("Missing SUPABASE_SERVICE_ROLE_KEY or DB_KEY for claiming sightings");
-    return;
-  }
-
   const adminSupabase = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    serviceRoleKey,
+    process.env.DB_KEY!,
     {
       auth: {
         persistSession: false,

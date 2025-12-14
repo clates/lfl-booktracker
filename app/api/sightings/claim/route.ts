@@ -1,4 +1,3 @@
-import { supabase } from '@/lib/supabase-admin';
 import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs';
@@ -10,13 +9,16 @@ export async function POST(request: Request) {
   try {
     const { anonymousId } = await request.json();
 
-    if (!anonymousId) {
-       return NextResponse.json({ message: "No anonymous ID provided" }, { status: 400 });
+    if (!anonymousId || !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(anonymousId)) {
+       return NextResponse.json({ message: "Invalid anonymous ID" }, { status: 400 });
     }
 
     // 1. Get authenticated user
     const cookieStore = cookies();
-    const supabase = createRouteHandlerClient({ cookies: () => cookieStore });
+    const supabase = createRouteHandlerClient({ cookies: () => cookieStore }, {
+      supabaseUrl: process.env.NEXT_PUBLIC_SUPABASE_URL,
+      supabaseKey: process.env.DB_KEY
+    });
     const { data: { session } } = await supabase.auth.getSession();
     
     if (!session?.user) {
@@ -25,22 +27,18 @@ export async function POST(request: Request) {
 
     const userId = session.user.id;
 
-    // 2. Initialize Admin Client (Service Role)
-    // We need service role because we might be updating rows that the user *can't see* yet via RLS 
-    // or to ensure we can update 'anonymous' rows reliably.
-    // Actually, RLS usually allows users to update their OWN rows, but these rows belong to 'anon' or NULL.
-    // So yes, Admin client is safest to 'adopt' these rows.
-    const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-    if (!serviceRoleKey) {
-        return NextResponse.json({ error: "Server configuration error" }, { status: 500 });
-    }
-
+    // 2. Claim sightings
+    // Use DB_KEY which acts as our service/admin key for this app logic
     const adminSupabase = createClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      serviceRoleKey,
-      { auth: { persistSession: false, autoRefreshToken: false } }
+      process.env.DB_KEY!,
+      {
+        auth: {
+          persistSession: false,
+          autoRefreshToken: false,
+        },
+      }
     );
-
     // 3. Update sightings
     const { data, error, count } = await adminSupabase
       .from("sightings")
