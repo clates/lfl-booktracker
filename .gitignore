@@ -4,4 +4,3 @@ node_modules/
 .backups/
 *.code-workspace
 .eslintrc.json
-package-lock.json
