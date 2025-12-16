@@ -22,7 +22,12 @@ const formSchema = z.object({
   code: z.string().length(9, 'Code must be exactly 9 characters'),
 });
 
-export function BookSearch() {
+interface BookSearchProps {
+  className?: string;
+  hideTitle?: boolean;
+}
+
+export function BookSearch({ className, hideTitle = false }: BookSearchProps) {
   const [bookData, setBookData] = useState<{ book: Book; sightings: Sighting[] } | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
@@ -57,9 +62,11 @@ export function BookSearch() {
   return (
     <div className="max-w-4xl mx-auto space-y-8">
       <Card>
-        <CardHeader>
-          <CardTitle>Search Book by Code</CardTitle>
-        </CardHeader>
+        {!hideTitle && (
+          <CardHeader>
+            <CardTitle>Search Book by Code</CardTitle>
+          </CardHeader>
+        )}
         <CardContent>
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">

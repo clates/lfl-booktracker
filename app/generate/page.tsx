@@ -152,7 +152,7 @@ export default function GeneratePage() {
   }
 
   return (
-    <div className="max-w-2xl mx-auto ">
+    <div className="container mx-auto px-4 py-8 max-w-2xl">
       <Card className="bg-accent">
         <CardHeader>
           <CardTitle>Generate Book Code</CardTitle>

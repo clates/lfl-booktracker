@@ -4,6 +4,7 @@ import { Inter } from 'next/font/google';
 import { Toaster } from '@/components/ui/toaster';
 import { ThemeProvider } from '@/components/theme-provider';
 import { Navigation } from '@/components/navigation';
+import { Footer } from '@/components/footer';
 import { cookies } from 'next/headers';
 import { createServerComponentClient } from '@supabase/auth-helpers-nextjs';
 import { claimSightings } from '@/lib/claimSightings';
@@ -50,9 +51,10 @@ export default async function RootLayout({
           disableTransitionOnChange
         >
           <Navigation />
-          <main className="container mx-auto px-4 py-8">
+          <main className="flex-1 min-h-screen">
             {children}
           </main>
+          <Footer />
           <Toaster />
         </ThemeProvider>
       </body>
