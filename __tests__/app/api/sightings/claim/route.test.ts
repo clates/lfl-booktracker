@@ -1,3 +1,6 @@
+/**
+ * @jest-environment node
+ */
 import { POST } from '@/app/api/sightings/claim/route';
 import { adminSupabase } from '@/lib/supabase-admin';
 import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs';
@@ -90,7 +93,7 @@ describe('POST /api/sightings/claim', () => {
     expect(response.status).toBe(200);
     const data = await response.json();
     expect(data.claimedCount).toBe(1);
-    
+
     // Check if adminSupabase was called correctly
     expect(adminSupabase.from).toHaveBeenCalledWith('sightings');
   });

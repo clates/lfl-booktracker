@@ -1,13 +1,40 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import { cn } from '@/lib/utils';
+import { usePathname, useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
-import { BookOpen, PlusCircle } from 'lucide-react';
+import { BookOpen, PlusCircle, LogIn, LogOut } from 'lucide-react';
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import { useEffect, useState, useMemo } from 'react';
+import type { User as SupabaseUser } from '@supabase/supabase-js';
+import { toast } from 'sonner';
 
 export function Navigation() {
   const pathname = usePathname();
+  const router = useRouter();
+  const [user, setUser] = useState<SupabaseUser | null>(null);
+  const supabase = useMemo(() => createClientComponentClient(), []);
+
+  useEffect(() => {
+    const getUser = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      setUser(session?.user ?? null);
+    };
+
+    getUser();
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
+    });
+
+    return () => subscription.unsubscribe();
+  }, [supabase]);
+
+  const handleSignOut = async () => {
+    await supabase.auth.signOut();
+    router.refresh();
+    toast.success('Signed out successfully');
+  };
 
   return (
     <header className="border-b">
@@ -25,15 +52,39 @@ export function Navigation() {
               Search
             </Link>
           </Button>
-          <Button
-            variant={pathname === '/generate' ? 'default' : 'ghost'}
-            asChild
-          >
-            <Link href="/generate">
-              <PlusCircle className="mr-2 h-4 w-4" />
-              Generate Code
-            </Link>
-          </Button>
+          
+          {user && (
+            <Button
+              variant={pathname === '/generate' ? 'default' : 'ghost'}
+              asChild
+            >
+              <Link href="/generate">
+                <PlusCircle className="mr-2 h-4 w-4" />
+                Generate Code
+              </Link>
+            </Button>
+          )}
+
+          {user ? (
+            <div className="flex items-center gap-2">
+              <span className="text-sm text-muted-foreground hidden md:inline-block">
+                {user.email}
+              </span>
+              <Button variant="ghost" size="icon" onClick={handleSignOut} title="Sign Out">
+                <LogOut className="h-4 w-4" />
+              </Button>
+            </div>
+          ) : (
+            <Button
+              variant={pathname === '/login' ? 'default' : 'ghost'}
+              asChild
+            >
+              <Link href="/login">
+                <LogIn className="mr-2 h-4 w-4" />
+                Login
+              </Link>
+            </Button>
+          )}
         </nav>
       </div>
     </header>
