@@ -21,12 +21,12 @@ export function HowItWorks() {
   ];
 
   return (
-    <section className="w-full py-12 md:py-24 lg:py-32 bg-slate-50 dark:bg-slate-900 rounded-lg my-8">
+    <section className="w-full py-12 md:py-24 lg:py-32 bg-secondary/30 rounded-lg my-8">
       <div className="container px-4 md:px-6 mx-auto">
         <div className="flex flex-col items-center justify-center space-y-4 text-center">
           <div className="space-y-2">
-            <h2 className="text-3xl font-bold tracking-tighter sm:text-5xl">How It Works</h2>
-            <p className="max-w-[900px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
+            <h2 className="font-serif text-3xl font-bold tracking-tighter sm:text-5xl text-primary">How It Works</h2>
+            <p className="max-w-[900px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed font-serif italic">
               Join the community of book lovers tracking the journey of their favorite stories.
             </p>
           </div>
@@ -34,11 +34,11 @@ export function HowItWorks() {
         <div className="mx-auto grid max-w-5xl items-start gap-6 py-12 lg:grid-cols-3 lg:gap-12">
           {steps.map((step, index) => (
             <div key={index} className="flex flex-col items-center space-y-4 text-center">
-              <div className="flex h-16 w-16 items-center justify-center rounded-full bg-primary/10">
+              <div className="flex h-16 w-16 items-center justify-center rounded-full bg-background border-2 border-primary/20 shadow-sm">
                 <step.icon className="h-8 w-8 text-primary" />
               </div>
               <div className="space-y-2">
-                <h3 className="text-xl font-bold">{step.title}</h3>
+                <h3 className="font-serif text-2xl font-bold text-primary">{step.title}</h3>
                 <p className="text-muted-foreground">{step.description}</p>
               </div>
             </div>
