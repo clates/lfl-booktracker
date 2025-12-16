@@ -18,7 +18,7 @@ export const Book3D = ({
 }: Book3DProps) => {
   return (
     <div
-      className={cn("relative z-10 group", className)}
+      className={cn("relative z-10 group w-full h-full", className)}
       style={{
         perspective: "1500px",
       }}
