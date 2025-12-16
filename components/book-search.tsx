@@ -61,7 +61,7 @@ export function BookSearch({ className, hideTitle = false }: BookSearchProps) {
 
   return (
     <div className="max-w-4xl mx-auto space-y-8">
-      <Card>
+      <Card className={className}>
         {!hideTitle && (
           <CardHeader>
             <CardTitle>Search Book by Code</CardTitle>
