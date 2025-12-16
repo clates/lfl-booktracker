@@ -41,6 +41,9 @@ export function GoogleBookSearch({ onSelect }: GoogleBookSearchProps) {
       setError(null)
       try {
         const response = await fetch(
+          // No API key used intentionally.
+          // Unauthenticated requests are rate-limited per user IP, distributing the quota cost
+          // to the end user rather than a centralized project quota.
           `https://www.googleapis.com/books/v1/volumes?q=intitle:${encodeURIComponent(debouncedQuery)}`
         )
         if (!response.ok) {
