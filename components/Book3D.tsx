@@ -46,7 +46,7 @@ export const Book3D = ({
           <div
             className="absolute inset-0 z-20 [backface-visibility:hidden] rounded-r-sm shadow-xl overflow-hidden bg-slate-200"
             style={{
-              backgroundImage: `url(${coverUrl})`,
+              backgroundImage: `url("${encodeURI(coverUrl)}")`,
               backgroundSize: "cover",
               backgroundPosition: "center",
             }}
