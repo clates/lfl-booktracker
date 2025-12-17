@@ -54,6 +54,21 @@ export async function POST(request: Request) {
       );
     }
 
+    // Check for existing sighting by this user for this book
+    const { data: existingSighting } = await supabase
+      .from('sightings')
+      .select('id')
+      .eq('book_id', bookId)
+      .eq('user_id', user.id)
+      .single();
+
+    if (existingSighting) {
+      return NextResponse.json(
+        { error: 'You have already recorded a sighting for this book' },
+        { status: 409 }
+      );
+    }
+
     // Insert: Use User Client (respects RLS)
     const { data, error } = await supabase
       .from('sightings')
@@ -61,7 +76,6 @@ export async function POST(request: Request) {
         book_id: bookId,
         user_id: user.id,
         location,
-        // date: Date.now(), // Schema handles created_at
         sighting_type: 'SIGHTING' 
       })
       .select()
