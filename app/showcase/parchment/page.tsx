@@ -79,6 +79,36 @@ export default function ParchmentShowcasePage() {
             </ParchmentFrame>
         </div>
 
+        {/* VARIANT 5: TATTERED (NEW) */}
+        <div className="space-y-4">
+            <h2 className="text-xl font-bold text-stone-700">5. Tattered (SVG Filter)</h2>
+            <ParchmentFrame variant="tattered" className="bg-[#e6dcc3]">
+                 <div className="flex flex-col items-center text-center space-y-4">
+                    <Feather className="w-12 h-12 text-stone-800 opacity-80" />
+                    <h3 className="text-2xl font-serif font-bold text-stone-900 border-b border-stone-800/20 pb-2">Ancient Manuscript</h3>
+                    <p className="text-stone-800 leading-relaxed font-serif font-medium">
+                        "This variant uses SVG filters to distort the DOM element's edges, creating a true organic, torn-paper feel. 
+                        It includes a noisy paper texture and inner vignetting."
+                    </p>
+                </div>
+            </ParchmentFrame>
+        </div>
+
+         {/* VARIANT 6: WAVY (NEW) */}
+         <div className="space-y-4">
+            <h2 className="text-xl font-bold text-stone-700">6. Wavy (SVG Filter)</h2>
+            <ParchmentFrame variant="wavy">
+                 <div className="flex flex-col items-center text-center space-y-4">
+                    <BookOpen className="w-12 h-12 text-amber-900 opacity-80" />
+                    <h3 className="text-2xl font-serif font-bold text-amber-900">Handmade Paper</h3>
+                    <p className="text-stone-700 leading-relaxed font-serif">
+                        "A softer, more subtle distortion that mimics the deckled edges of handmade paper. 
+                        Uses a lower frequency turbulence filter."
+                    </p>
+                </div>
+            </ParchmentFrame>
+        </div>
+
       </div>
 
       <div className="max-w-2xl mx-auto">
