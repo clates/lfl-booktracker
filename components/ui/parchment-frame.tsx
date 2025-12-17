@@ -11,39 +11,37 @@ export function ParchmentFrame({
   variant = 'default',
   ...props
 }: ParchmentFrameProps) {
-  // Base styles for all variants
-  const baseStyles = "relative transition-all duration-300 isolate";
+  // Base structural styles (padding, positioning) - applied to the container
+  const containerStyles = "relative transition-all duration-300 isolate";
 
-  // Variant specific styles
-  const variants = {
-    default: "bg-[#fdfbf7] border border-[#e6e2d3] rounded-sm shadow-sm p-6 overflow-hidden",
-    ragged: `
-      bg-[#fffef0] 
-      p-8
-      shadow-lg
-      [clip-path:polygon(0%_0%,100%_0%,100%_100%,0%_100%)] 
-      before:content-[''] before:absolute before:inset-0 before:bg-white/20 before:pointer-events-none
-      border-2 border-transparent
-      overflow-hidden
-    `,
-    ancient: "bg-[#e8dec0] border border-[#d6cba0] rounded shadow-md p-6 sepia-[0.3] brightness-95 overflow-hidden",
-    decorated: "bg-[#fbf8f1] border-4 border-double border-[#bba588] p-6 rounded-lg shadow-xl overflow-hidden",
-    
-    // NEW VARIANTS using SVG filters
-    tattered: `
-      bg-[#e3d5b0] 
-      text-[#3d3226]
-      p-8 
-      shadow-[5px_5px_15px_rgba(0,0,0,0.3)]
-    `,
-    wavy: `
-      bg-[#f5eeda]
-      p-8
-      shadow-md
-    `,
+  // Content styles (text color, etc)
+  const contentStyles = {
+      default: "text-stone-900 p-6",
+      ragged: "text-stone-900 p-8",
+      ancient: "p-6", // text color handled by inner elements or inheritance? ancient had specific look
+      decorated: "text-stone-800 p-6",
+      tattered: "text-[#3d3226] p-8",
+      wavy: "text-stone-900 p-8",
   };
 
-  // Additional decorative elements based on variant
+  // Surface styles (background, border, shadow, filter) - applied to the background layer
+  const surfaceClasses = {
+    default: "bg-[#fdfbf7] border border-[#e6e2d3] rounded-sm shadow-sm",
+    ragged: `
+      bg-[#fffef0] 
+      shadow-lg
+      [clip-path:polygon(0%_0%,100%_0%,100%_100%,0%_100%)] 
+      border-2 border-transparent
+    `,
+    ancient: "bg-[#e8dec0] border border-[#d6cba0] rounded shadow-md sepia-[0.3] brightness-95",
+    decorated: "bg-[#fbf8f1] border-4 border-double border-[#bba588] rounded-lg shadow-xl",
+    tattered: "bg-[#e3d5b0] shadow-[5px_5px_15px_rgba(0,0,0,0.3)]",
+    wavy: "bg-[#f5eeda] shadow-md",
+  };
+  
+  const isFiltered = variant === 'tattered' || variant === 'wavy';
+
+  // Additional decorations (overlay textures etc)
   const renderDecorations = () => {
     switch (variant) {
       case 'ragged':
@@ -69,9 +67,7 @@ export function ParchmentFrame({
       case 'tattered':
         return (
           <>
-            {/* Inner shadow/burn effect */}
             <div className="absolute inset-0 pointer-events-none shadow-[inset_0_0_40px_rgba(139,69,19,0.2)]" />
-            {/* Noise texture opacity */}
              <div 
                className="absolute inset-0 pointer-events-none opacity-[0.08]" 
                style={{ 
@@ -80,24 +76,17 @@ export function ParchmentFrame({
              />
           </>
         );
-      case 'wavy':
-        return null;
       default:
         return null;
     }
   };
 
-  // Inline styles for filter application
-  // We use specific IDs for filters to reference them
+  // Filter styles
   const filterStyle = variant === 'tattered' ? { filter: 'url(#paper-edge-rough)' } :
                       variant === 'wavy' ? { filter: 'url(#paper-edge-wavy)' } : {};
 
   return (
     <div className="relative group">
-       {/* SVG Filters Definition - Rendered once per component but IDs must be unique if used multiple times 
-           with different params. For this demo, static IDs are fine or we could ID them. 
-           We use 'hidden' height but keep it in DOM for reference. 
-       */}
        <svg className="absolute w-0 h-0 pointer-events-none">
         <defs>
           <filter id="paper-edge-rough" x="-20%" y="-20%" width="140%" height="140%">
@@ -112,11 +101,18 @@ export function ParchmentFrame({
       </svg>
 
       <div
-        className={cn(baseStyles, variants[variant], className)}
+        className={cn(containerStyles, contentStyles[variant], className)}
         {...props}
-        style={{ ...filterStyle, ...props.style }}
+        style={{ ...props.style }} 
       >
-          {renderDecorations()}
+          {/* Background Layer: Handles color, shadow, borders, and FILTERS */}
+          <div 
+            className={cn("absolute inset-0 -z-10", surfaceClasses[variant])}
+            style={isFiltered ? filterStyle : undefined}
+          >
+              {renderDecorations()}
+          </div>
+
           <div className="relative z-10">
               {children}
           </div>
