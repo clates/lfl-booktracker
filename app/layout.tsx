@@ -1,14 +1,20 @@
 import './globals.css';
 import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
+import { Inter, Crimson_Text } from 'next/font/google';
 import { Toaster } from '@/components/ui/toaster';
 import { ThemeProvider } from '@/components/theme-provider';
 import { Navigation } from '@/components/navigation';
+import { Footer } from '@/components/footer';
 import { cookies } from 'next/headers';
 import { createServerComponentClient } from '@supabase/auth-helpers-nextjs';
 import { claimSightings } from '@/lib/claimSightings';
 
-const inter = Inter({ subsets: ['latin'] });
+const inter = Inter({ subsets: ['latin'], variable: '--font-sans' });
+const crimson = Crimson_Text({ 
+  weight: ['400', '600', '700'],
+  subsets: ['latin'],
+  variable: '--font-serif'
+});
 
 export const metadata: Metadata = {
   title: 'BookTracker',
@@ -42,7 +48,7 @@ export default async function RootLayout({
 
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={inter.className}>
+      <body className={`${inter.variable} ${crimson.variable} font-sans`}>
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
@@ -50,9 +56,10 @@ export default async function RootLayout({
           disableTransitionOnChange
         >
           <Navigation />
-          <main className="container mx-auto px-4 py-8">
+          <main className="flex-1 min-h-screen">
             {children}
           </main>
+          <Footer />
           <Toaster />
         </ThemeProvider>
       </body>
