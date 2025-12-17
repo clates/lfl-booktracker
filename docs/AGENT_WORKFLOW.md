@@ -27,21 +27,21 @@ There are 5 pre-provisioned agent slots:
 ### 2. Assigning a Task
 When you want to run an agent:
 1. Choose a free slot (e.g., `agent-1`).
-2. **Copy the Template:** Open [docs/AGENT_TASK_TEMPLATE.md](file:///home/clates/lfl-booktracker/docs/AGENT_TASK_TEMPLATE.md), copy the text, fill in the agent ID, and paste it as your first message to the agent.
+2. **Copy the Template:** Open [docs/AGENT_TASK_TEMPLATE.md](AGENT_TASK_TEMPLATE.md), copy the text, fill in the agent ID, and paste it as your first message to the agent.
 3. This ensures the agent understands its boundaries and git context immediately.
 
-### 2. Git Workflow per Agent
+### 3. Git Workflow per Agent
 Each workspace is a valid Git repository (linked via `git worktree`).
 - **Commits**: Can be made normally.
 - **Branches**: The workspace comes with a dedicated branch `agent-N-workspace`.
   - *Recommendation*: Agents should create feature branches off the HEAD of `main` if starting a fresh task: `git checkout -b feature/my-new-task`.
 - **Pushing**: `git push origin feature/my-new-task` works as expected.
 
-### 3. Environment
+### 4. Environment
 - **Node Modules**: Each workspace has its own isolated `node_modules` folder. Agents can run `npm install`, `npm run dev`, or tests without conflicting with others.
 - **Environment Variables**: The setup script copies `.env.local` to each workspace. Ensure agents update this if they need specific keys.
 
-### 4. Cleanup
+### 5. Cleanup
 To reset an agent workspace:
 1. Commit or stash important changes.
 2. Reset the branch: `git reset --hard main` (or origin/main).
