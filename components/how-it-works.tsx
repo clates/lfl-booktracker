@@ -1,27 +1,29 @@
-
-import { Tag, Send, Map } from 'lucide-react';
+import Image from 'next/image';
 
 export function HowItWorks() {
   const steps = [
     {
       title: "Tag It",
       description: "Generate a unique code for your book and write it on the inside cover.",
-      icon: Tag,
+      image: "/images/heros/boy-write-book-cropped.png",
+      alt: "Illustration of a boy writing in a book",
     },
     {
       title: "Release It",
       description: "Leave your book in a Little Free Library or pass it to a friend.",
-      icon: Send,
+      image: "/images/heros/boy-book-library.png",
+      alt: "Illustration of a boy placing a book in a library",
     },
     {
       title: "Watch It Go",
       description: "Get notified when someone finds your book and continues its journey.",
-      icon: Map,
+      image: "/images/heros/magnify.png",
+      alt: "Illustration of a magnifying glass",
     },
   ];
 
   return (
-    <section className="w-full py-12 md:py-24 lg:py-32 bg-secondary/30 rounded-lg my-8">
+    <section className="w-full py-12 md:py-24 lg:py-32 bg-background rounded-lg my-8">
       <div className="container px-4 md:px-6 mx-auto">
         <div className="flex flex-col items-center justify-center space-y-4 text-center">
           <div className="space-y-2">
@@ -34,8 +36,13 @@ export function HowItWorks() {
         <div className="mx-auto grid max-w-5xl items-start gap-6 py-12 lg:grid-cols-3 lg:gap-12">
           {steps.map((step, index) => (
             <div key={index} className="flex flex-col items-center space-y-4 text-center">
-              <div className="flex h-16 w-16 items-center justify-center rounded-full bg-background border-2 border-primary/20 shadow-sm">
-                <step.icon className="h-8 w-8 text-primary" />
+              <div className="relative h-48 w-48 mb-4">
+                <Image
+                  src={step.image}
+                  alt={step.alt}
+                  fill
+                  className="object-contain"
+                />
               </div>
               <div className="space-y-2">
                 <h3 className="font-serif text-2xl font-bold text-primary">{step.title}</h3>
