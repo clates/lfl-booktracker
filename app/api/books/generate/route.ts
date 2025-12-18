@@ -40,9 +40,29 @@ export async function POST(request: Request) {
     })
 
     // 4. Prepare Metadata
-    const typedBook = book as OpenLibraryDoc
-    const cover_url = typedBook ? getBookCover(typedBook) : null
-    const isbn = typedBook?.isbn ? typedBook.isbn[0] : null
+    // 4. Prepare Metadata
+    // The 'book' object might be an OpenLibraryDoc or a generic object from GoogleBookSearch
+    const bookData = book as any; 
+    
+    const title = bookData.title || "Unknown Title";
+    
+    // Handle authors: could be 'authors' (Google) or 'author_name' (OpenLibrary) or just 'author'
+    let author = "Unknown Author";
+    if (Array.isArray(bookData.authors) && bookData.authors.length > 0) {
+        author = bookData.authors.join(", ");
+    } else if (Array.isArray(bookData.author_name) && bookData.author_name.length > 0) {
+        author = bookData.author_name[0]; // Keep first author for consistency with old behavior
+    } else if (typeof bookData.author === 'string') {
+        author = bookData.author;
+    }
+
+    // Handle cover: use direct url or generate from OLID
+    let cover_link = bookData.coverUrl || bookData.cover_url;
+    if (!cover_link && bookData.cover_edition_key) {
+        cover_link = getBookCover(bookData);
+    }
+
+    const isbn = bookData.isbn ? (Array.isArray(bookData.isbn) ? bookData.isbn[0] : bookData.isbn) : null;
 
     // 5. Persist Book
     const { data, error } = await adminSupabase
@@ -51,11 +71,11 @@ export async function POST(request: Request) {
         code,
         lat,
         lon: long,
-        title: typedBook?.title || "Unknown Title",
-        author: typedBook?.author_name?.[0] || "Unknown Author",
+        title: title,
+        author: author,
         isbn: isbn,
-        cover_url: cover_url,
-        location: `${lat},${long}`,
+        cover_url: cover_link,
+        location: `${lat},${long}` 
       })
       .select()
       .single()

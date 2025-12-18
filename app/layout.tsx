@@ -28,7 +28,6 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   const cookieStore = await cookies()
   // Ensure we use the ANON key for client operations to respect RLS
   const supabase = createServerComponentClient(
-    // @ts-expect-error - The library expects a Promise based on types but the implementation is synchronous
     { cookies: () => cookieStore },
     {
       supabaseUrl: process.env.NEXT_PUBLIC_SUPABASE_URL,
@@ -49,7 +48,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
 
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${inter.variable} ${crimson.variable} font-sans`}>
+      <body className={`font-sans`}>
         <ParchmentFilters />
         <ThemeProvider
           attribute="class"
