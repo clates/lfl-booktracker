@@ -1,11 +1,11 @@
-"use client";
+'use client';
 
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-import * as z from "zod";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useForm } from 'react-hook-form';
+import * as z from 'zod';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
 import {
   Form,
   FormControl,
@@ -13,31 +13,31 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form";
-import { useEffect, useState } from "react";
-import { GenerateBookCodeRequest } from "@/lib/types";
-import { useToast } from "@/hooks/use-toast";
-import useLocation from "@/hooks/use-location";
-import { OpenLibraryDoc, getBookCover } from "@/lib/openLibrary";
-import AutoCompleteResults from "@/components/autoCompleteResults";
-import { Accordion } from "@/components/ui/accordion";
+} from '@/components/ui/form';
+import { useEffect, useState } from 'react';
+import { GenerateBookCodeRequest } from '@/lib/types';
+import { useToast } from '@/hooks/use-toast';
+import useLocation from '@/hooks/use-location';
+import { OpenLibraryDoc, getBookCover } from '@/lib/openLibrary';
+import AutoCompleteResults from '@/components/autoCompleteResults';
+import { Accordion } from '@/components/ui/accordion';
 
 const formSchema = z.object({
-  location: z.string().min(2, "Location must be at least 2 characters"),
-  author: z.string().min(2, "Author must be at least 2 characters"),
-  title: z.string().min(2, "Title must be at least 2 characters"),
-  lat: z.string().min(2, "Title must be at least 2 characters"),
-  long: z.string().min(2, "Title must be at least 2 characters"),
-  isbn: z.string().min(2, "ISBN must be at least 8 characters"),
+  location: z.string().min(2, 'Location must be at least 2 characters'),
+  author: z.string().min(2, 'Author must be at least 2 characters'),
+  title: z.string().min(2, 'Title must be at least 2 characters'),
+  lat: z.string().min(2, 'Title must be at least 2 characters'),
+  long: z.string().min(2, 'Title must be at least 2 characters'),
+  isbn: z.string().min(2, 'ISBN must be at least 8 characters'),
 });
 
 export default function GeneratePage() {
-  const [generatedCode, setGeneratedCode] = useState<string>("");
+  const [generatedCode, setGeneratedCode] = useState<string>('');
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
   const { latitude, longitude, error } = useLocation();
-  const [titleInput, setTitleInput] = useState<string>("");
-  const [isbnInput, setIsbnInput] = useState<string>("");
+  const [titleInput, setTitleInput] = useState<string>('');
+  const [isbnInput, setIsbnInput] = useState<string>('');
   const [titleResults, setTitleResults] = useState<any[]>([]);
   const [selectedBook, setSelectedBook] = useState<OpenLibraryDoc | null>(null);
 
@@ -47,7 +47,7 @@ export default function GeneratePage() {
    */
   useEffect(() => {
     const fetchResults = async () => {
-      let searchCriteria = "";
+      let searchCriteria = '';
       if (titleInput.length >= 6) {
         searchCriteria = `title=${titleInput}*`;
       } else if (isbnInput.length >= 8) {
@@ -58,11 +58,9 @@ export default function GeneratePage() {
           `https://openlibrary.org/search.json?${searchCriteria}&fields=title,author_name,cover_i,isbn,ratings_count,cover_edition_key&limit=20`
         );
         const data: { docs: OpenLibraryDoc[] } = await response.json();
-        setTitleResults(
-          data.docs.sort((a, b) => a.ratings_count - b.ratings_count) || []
-        );
+        setTitleResults(data.docs.sort((a, b) => a.ratings_count - b.ratings_count) || []);
       } catch (fetchError) {
-        console.error("Error fetching data:", fetchError);
+        console.error('Error fetching data:', fetchError);
       }
     };
 
@@ -82,9 +80,9 @@ export default function GeneratePage() {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      author: "",
-      title: "",
-      isbn: "",
+      author: '',
+      title: '',
+      isbn: '',
     },
   });
 
@@ -96,7 +94,7 @@ export default function GeneratePage() {
   }
 
   useEffect(() => {
-    if (!getCookie("lfl_anonymous_id")) {
+    if (!getCookie('lfl_anonymous_id')) {
       const newId = crypto.randomUUID();
       // Set cookie for 1 year
       document.cookie = `lfl_anonymous_id=${newId}; path=/; max-age=31536000; SameSite=Lax; Secure`;
@@ -106,11 +104,11 @@ export default function GeneratePage() {
   async function onSubmit() {
     setIsLoading(true);
     try {
-      const anonymousId = getCookie("lfl_anonymous_id");
-      const response = await fetch("/api/books/generate", {
-        method: "POST",
+      const anonymousId = getCookie('lfl_anonymous_id');
+      const response = await fetch('/api/books/generate', {
+        method: 'POST',
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
         },
         body: JSON.stringify({
           book: selectedBook,
@@ -123,20 +121,20 @@ export default function GeneratePage() {
       });
 
       if (!response.ok) {
-        throw new Error("Failed to record hit");
+        throw new Error('Failed to record hit');
       }
 
       const { code } = await response.json();
       setGeneratedCode(code);
       toast({
-        title: "Success",
-        description: "ID Generated Successfully",
+        title: 'Success',
+        description: 'ID Generated Successfully',
       });
     } catch (error) {
       toast({
-        title: "Error",
-        description: "Failed to generate ID. Please try again.",
-        variant: "destructive",
+        title: 'Error',
+        description: 'Failed to generate ID. Please try again.',
+        variant: 'destructive',
       });
     } finally {
       setIsLoading(false);
@@ -145,10 +143,7 @@ export default function GeneratePage() {
 
   // Format the code into ###-###-### format
   function formatCode(code: string) {
-    return `${code.slice(0, 4)}-${code.slice(4, 6)}-${code.slice(
-      6,
-      9
-    )}`.toUpperCase();
+    return `${code.slice(0, 4)}-${code.slice(4, 6)}-${code.slice(6, 9)}`.toUpperCase();
   }
 
   return (
@@ -237,26 +232,19 @@ export default function GeneratePage() {
             <div className="flex flex-col gap-3">
               <div className="flex flex-row justify-around gap-1">
                 <div className="flex flex-col gap-1">
-                  <h3 className="text-lg text-accent-foreground">
-                    {selectedBook.title}
-                  </h3>
+                  <h3 className="text-lg text-accent-foreground">{selectedBook.title}</h3>
                   <p className="text-md text-muted-foreground">
-                    {selectedBook.author_name?.join(", ")}
+                    {selectedBook.author_name?.join(', ')}
                   </p>
 
                   {selectedBook.isbn && (
-                    <p className="text-md text-muted-foreground">
-                      ISBN: {selectedBook.isbn[0]}
-                    </p>
+                    <p className="text-md text-muted-foreground">ISBN: {selectedBook.isbn[0]}</p>
                   )}
                 </div>
                 {
                   // Display the book cover
                   selectedBook.cover_edition_key && (
-                    <img
-                      src={getBookCover(selectedBook)}
-                      className="w-40 h-40"
-                    />
+                    <img src={getBookCover(selectedBook)} className="w-40 h-40" />
                   )
                 }
               </div>
@@ -269,12 +257,8 @@ export default function GeneratePage() {
       )}
       {generatedCode && (
         <div className="mt-6 p-4 bg-muted rounded-lg">
-          <p className="text-sm font-medium text-muted-foreground mb-2">
-            Generated Code:
-          </p>
-          <p className="text-3xl font-mono text-center">
-            {formatCode(generatedCode)}
-          </p>
+          <p className="text-sm font-medium text-muted-foreground mb-2">Generated Code:</p>
+          <p className="text-3xl font-mono text-center">{formatCode(generatedCode)}</p>
         </div>
       )}
     </div>

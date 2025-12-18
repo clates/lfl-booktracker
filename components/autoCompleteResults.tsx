@@ -1,6 +1,6 @@
-import { OpenLibraryDoc, getBookCover } from "@/lib/openLibrary";
-import { X } from "lucide-react";
-import React from "react";
+import { OpenLibraryDoc, getBookCover } from '@/lib/openLibrary';
+import { X } from 'lucide-react';
+import React from 'react';
 
 type AutoCompleteResultsProps = {
   results: OpenLibraryDoc[];
@@ -9,10 +9,7 @@ type AutoCompleteResultsProps = {
 
 const rowHeight = 50;
 
-const AutoCompleteResults: React.FC<AutoCompleteResultsProps> = ({
-  results,
-  onSelect,
-}) => {
+const AutoCompleteResults: React.FC<AutoCompleteResultsProps> = ({ results, onSelect }) => {
   return (
     <div className="relative flex flex-col gap-[1px] overflow-scroll transition-opacity duration-300 ease-in-out transform -translate-y-[10px] max-h-[225px]">
       {results.map((book, index) => (
@@ -30,11 +27,9 @@ const AutoCompleteResults: React.FC<AutoCompleteResultsProps> = ({
             }}
           ></div>
           <div className="absolute inset-0 flex flex-col justify-around items-start p-4">
-            <h3 className="text-[#222] text-[16px] text-left whitespace-nowrap">
-              {book.title}
-            </h3>
-            <p style={{ fontSize: "14px", margin: "0", color: "#555" }}>
-              {book.author_name?.join(", ")}
+            <h3 className="text-[#222] text-[16px] text-left whitespace-nowrap">{book.title}</h3>
+            <p style={{ fontSize: '14px', margin: '0', color: '#555' }}>
+              {book.author_name?.join(', ')}
             </p>
           </div>
         </div>

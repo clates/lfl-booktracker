@@ -17,18 +17,10 @@ export function Navigation() {
           <span className="font-bold text-xl">BookTracker</span>
         </Link>
         <nav className="flex items-center space-x-4">
-          <Button
-            variant={pathname === '/' ? 'default' : 'ghost'}
-            asChild
-          >
-            <Link href="/">
-              Search
-            </Link>
+          <Button variant={pathname === '/' ? 'default' : 'ghost'} asChild>
+            <Link href="/">Search</Link>
           </Button>
-          <Button
-            variant={pathname === '/generate' ? 'default' : 'ghost'}
-            asChild
-          >
+          <Button variant={pathname === '/generate' ? 'default' : 'ghost'} asChild>
             <Link href="/generate">
               <PlusCircle className="mr-2 h-4 w-4" />
               Generate Code

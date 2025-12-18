@@ -6,7 +6,7 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 // Disambiguate the charset by removing, B, I, L, O, S
-export const DISAMBIGUATED_CHARS = `ACDEFGHJKMNPQRUVWXYZ0123456789`
+export const DISAMBIGUATED_CHARS = `ACDEFGHJKMNPQRUVWXYZ0123456789`;
 
 export const disambiguate = (input: string) => {
   return input.toUpperCase().replace(/[BILLOS]/g, (char) => {
@@ -25,4 +25,4 @@ export const disambiguate = (input: string) => {
         return char;
     }
   });
-}
+};

@@ -6,7 +6,7 @@ describe('geohash utility', () => {
       // US Bounds: 24-50, -125 to -66
       const lat = 37.7749; // San Francisco
       const lon = -122.4194;
-      
+
       const hash = encodeGeoHash(lat, lon);
       expect(hash.length).toBe(5);
       expect(hash.startsWith('W')).toBe(false);
@@ -16,7 +16,7 @@ describe('geohash utility', () => {
       // London (Outside US)
       const lat = 51.5074;
       const lon = -0.1278;
-      
+
       const hash = encodeGeoHash(lat, lon);
       expect(hash.length).toBe(5); // W + 4
       expect(hash.startsWith('W')).toBe(true);
@@ -30,7 +30,7 @@ describe('geohash utility', () => {
     it('handles US boundary conditions correctly', () => {
       // Exact US Bottom-Left: 24.0, -125.0
       expect(encodeGeoHash(24.0, -125.0).startsWith('W')).toBe(false);
-      
+
       // Just Outside US Bottom-Left: 23.99, -125.0
       expect(encodeGeoHash(23.99, -125.0).startsWith('W')).toBe(true);
     });

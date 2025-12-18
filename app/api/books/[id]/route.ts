@@ -5,22 +5,22 @@ import { cookies } from 'next/headers';
 export const dynamic = 'force-dynamic';
 
 // export async function generateStaticParams() {
-//   // Static params generation requires a client. 
+//   // Static params generation requires a client.
 //   // Skipping for now as this is dynamic.
 //   return [];
 // }
 
-export async function GET(
-  request: Request,
-  { params }: any
-) {
+export async function GET(request: Request, { params }: any) {
   try {
     const cookieStore = cookies();
     // Explicitly use the DB_KEY which functions as our Anon/Service key here
-    const supabase = createRouteHandlerClient({ cookies: () => cookieStore }, {
-      supabaseUrl: process.env.NEXT_PUBLIC_SUPABASE_URL,
-      supabaseKey: process.env.DB_KEY
-    });
+    const supabase = createRouteHandlerClient(
+      { cookies: () => cookieStore },
+      {
+        supabaseUrl: process.env.NEXT_PUBLIC_SUPABASE_URL,
+        supabaseKey: process.env.DB_KEY,
+      }
+    );
 
     const { data: book, error: bookError } = await supabase
       .from('books')
@@ -45,9 +45,6 @@ export async function GET(
     return NextResponse.json({ book, sightings });
   } catch (error) {
     console.error('Error fetching book:', error);
-    return NextResponse.json(
-      { error: 'Failed to fetch book data' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Failed to fetch book data' }, { status: 500 });
   }
 }

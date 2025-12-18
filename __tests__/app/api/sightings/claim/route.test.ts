@@ -11,7 +11,7 @@ jest.mock('@/lib/supabase-admin', () => ({
       update: jest.fn(() => ({
         eq: jest.fn(() => ({
           is: jest.fn(() => ({
-            select: jest.fn().mockResolvedValue({ data: [{ id: '1' }], error: null })
+            select: jest.fn().mockResolvedValue({ data: [{ id: '1' }], error: null }),
           })),
         })),
       })),
@@ -90,7 +90,7 @@ describe('POST /api/sightings/claim', () => {
     expect(response.status).toBe(200);
     const data = await response.json();
     expect(data.claimedCount).toBe(1);
-    
+
     // Check if adminSupabase was called correctly
     expect(adminSupabase.from).toHaveBeenCalledWith('sightings');
   });

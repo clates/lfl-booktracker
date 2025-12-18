@@ -95,9 +95,7 @@ export function BookResults({ book, sightings: initialSightings }: BookResultsPr
                 <TableRow key={hit.id}>
                   <TableCell>{hit.user?.email || 'Anonymous'}</TableCell>
                   <TableCell>{hit.location}</TableCell>
-                  <TableCell>
-                    {format(new Date(hit.created_at), 'PPp')}
-                  </TableCell>
+                  <TableCell>{format(new Date(hit.created_at), 'PPp')}</TableCell>
                 </TableRow>
               ))}
             </TableBody>

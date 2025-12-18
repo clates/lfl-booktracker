@@ -17,21 +17,20 @@ export const metadata: Metadata = {
 
 export const dynamic = 'force-dynamic';
 
-export default async function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const cookieStore = cookies();
   // Ensure we use the ANON key for client operations to respect RLS
-  const supabase = createServerComponentClient({ cookies: () => cookieStore }, {
-    supabaseUrl: process.env.NEXT_PUBLIC_SUPABASE_URL,
-    supabaseKey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-  });
+  const supabase = createServerComponentClient(
+    { cookies: () => cookieStore },
+    {
+      supabaseUrl: process.env.NEXT_PUBLIC_SUPABASE_URL,
+      supabaseKey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+    }
+  );
   const {
     data: { session },
   } = await supabase.auth.getSession();
-  
+
   const anonymousId = cookieStore.get('lfl_anonymous_id')?.value;
 
   if (session?.user?.id && anonymousId) {
@@ -50,9 +49,7 @@ export default async function RootLayout({
           disableTransitionOnChange
         >
           <Navigation />
-          <main className="container mx-auto px-4 py-8">
-            {children}
-          </main>
+          <main className="container mx-auto px-4 py-8">{children}</main>
           <Toaster />
         </ThemeProvider>
       </body>

@@ -1,4 +1,4 @@
-import { OpenLibraryDoc } from "./openLibrary";
+import { OpenLibraryDoc } from './openLibrary';
 
 export type Book = {
   id: string;
@@ -32,4 +32,4 @@ export type GenerateBookCodeRequest = {
   book: OpenLibraryDoc;
   location: { lat: string | number; long: string | number };
   anonymousId?: string;
-}
+};

@@ -3,7 +3,7 @@
 // Original: (c) 2008 David Troy
 // Distributed under the MIT License
 
-export const BASE32 = "0123456789ABCDEFGHJKMNPQRSTVWXYZ";
+export const BASE32 = '0123456789ABCDEFGHJKMNPQRSTVWXYZ';
 
 const BITS = [16, 8, 4, 2, 1];
 
@@ -25,20 +25,12 @@ export function encodeGeoHash(latitude: number, longitude: number): string {
     longitude >= US_LON_MIN &&
     longitude <= US_LON_MAX
   ) {
-    return encode(
-      latitude,
-      longitude,
-      US_LAT_MIN,
-      US_LAT_MAX,
-      US_LON_MIN,
-      US_LON_MAX,
-      5
-    );
+    return encode(latitude, longitude, US_LAT_MIN, US_LAT_MAX, US_LON_MIN, US_LON_MAX, 5);
   } else {
     // Rest of World: Prefix 'W' + 4 char standard global hash
     // Standard Bounds: Lat -90..90, Lon -180..180
     const suffix = encode(latitude, longitude, -90, 90, -180, 180, 4);
-    return "W" + suffix;
+    return 'W' + suffix;
   }
 }
 
@@ -56,7 +48,7 @@ function encode(
   let lonInterval = [minLon, maxLon];
   let bit = 0;
   let ch = 0;
-  let geohash = "";
+  let geohash = '';
 
   while (geohash.length < precision) {
     if (isEven) {
@@ -93,7 +85,7 @@ function encode(
 export function normalizeGeoHash(input: string): string {
   return input
     .toUpperCase()
-    .replace(/O/g, "0")
-    .replace(/[IL]/g, "1")
-    .replace(/[^0-9A-Z]/g, ""); // Strip non-alphanumeric
+    .replace(/O/g, '0')
+    .replace(/[IL]/g, '1')
+    .replace(/[^0-9A-Z]/g, ''); // Strip non-alphanumeric
 }

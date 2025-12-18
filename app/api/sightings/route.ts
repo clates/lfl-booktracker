@@ -14,14 +14,12 @@ export async function GET(request: Request) {
   // But consistent use of adminSupabase for non-user-specific data is acceptable here or just use Anon.
   // Since we already imported adminSupabase and used it elsewhere, let's stick to it or Anon?
   // User asked for "Correct Key Usage". GET is public.
-  // But wait, adminSupabase bypasses RLS. Does GET need to respect RLS? 
+  // But wait, adminSupabase bypasses RLS. Does GET need to respect RLS?
   // RLS says "Enable read access for all users". So Anon key is fine.
-  // HOWEVER, I will use adminSupabase for now to guarantee it works as I don't want to fight imports again, 
+  // HOWEVER, I will use adminSupabase for now to guarantee it works as I don't want to fight imports again,
   // and GET is read-only.
-  
-  let query = adminSupabase
-    .from('sightings')
-    .select('*, book:books(*)');
+
+  let query = adminSupabase.from('sightings').select('*, book:books(*)');
 
   // TODO: Implement bounds filtering if supported by schema (lat/lon)
   // if (bounds) ...
@@ -38,20 +36,23 @@ export async function GET(request: Request) {
 export async function POST(request: Request) {
   try {
     const { bookId, location } = await request.json();
-    
+
     // Auth Check: Use Anon Key with Session
     const cookieStore = cookies();
-    const supabase = createRouteHandlerClient({ cookies: () => cookieStore }, {
+    const supabase = createRouteHandlerClient(
+      { cookies: () => cookieStore },
+      {
         supabaseUrl: process.env.NEXT_PUBLIC_SUPABASE_URL,
-        supabaseKey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-    });
-    
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
+        supabaseKey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+      }
+    );
+
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser();
     if (authError || !user) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     // Insert: Use User Client (respects RLS)
@@ -62,7 +63,7 @@ export async function POST(request: Request) {
         user_id: user.id,
         location,
         // date: Date.now(), // Schema handles created_at
-        sighting_type: 'SIGHTING' 
+        sighting_type: 'SIGHTING',
       })
       .select()
       .single();
@@ -72,9 +73,6 @@ export async function POST(request: Request) {
     return NextResponse.json(data);
   } catch (error) {
     console.error('Error creating sighting:', error);
-    return NextResponse.json(
-      { error: 'Failed to create sighting' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Failed to create sighting' }, { status: 500 });
   }
 }
