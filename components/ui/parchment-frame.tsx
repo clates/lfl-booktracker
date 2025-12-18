@@ -24,14 +24,8 @@ export function ParchmentFrame({
       wavy: "text-stone-900 p-8",
   };
 
-  // Surface styles (background, border, shadow, filter) - applied to the background layer
-  // For standard variants, we can keep them on the container or move them here. 
-  // To stop the filter from affecting text, we MUST move the filtered backgrounds to a separate layer.
-  // For consistency, let's separate them for the filtered variants, and leave the others as-is if possible, 
-  // or unified strategy. Unified is cleaner.
-  
-  // Actually, separating fully is safest.
-  // Let's define the "Background Element" classes.
+  // Surface styles (background, border, shadow, filter) applied to a separate background layer.
+  // Filtered variants use this layer so visual filters do not affect the foreground text content.
   const surfaceClasses = {
     default: "bg-[#fdfbf7] border border-[#e6e2d3] rounded-sm shadow-sm",
     ragged: `
@@ -99,7 +93,6 @@ export function ParchmentFrame({
       <div
         className={cn(containerStyles, contentStyles[variant], className)}
         {...props}
-        // Remove style prop from here if it contained the filter
         style={{ ...props.style }} 
       >
           {/* Background Layer: Handles color, shadow, borders, and FILTERS */}
@@ -107,24 +100,7 @@ export function ParchmentFrame({
             className={cn("absolute inset-0 -z-10", surfaceClasses[variant])}
             style={isFiltered ? filterStyle : undefined}
           >
-             {/* Some decorations need to be inside the filtered layer to be distorted (like the border), 
-                 others might need to be on top.
-                 For tattered/wavy, the visual 'edge' comes from this div. 
-                 If we put inner shadows here, they distort too, which is usually good.
-             */}
-              {/* For ragged/ancient/decorated, we need to make sure their decorations render correctly 
-                  if we move them here. 
-                  - ragged: uses :before in CSS for overlay. That will work if applied to this div.
-                  - ancient: sepia/brightness filters. 
-                  - decorated: borders.
-                  
-                  Let's move renderDecorations inside here for consistent layering? 
-                  The corner flourishes in 'decorated' should probably NOT be distorted if we were filtering it, 
-                  but we aren't filtering 'decorated'. 
-                  For 'tattered', the noise and inset shadow SHOULD ideally be distorted or match the background.
-                  
-                  Let's Try: Put decorations inside this background layer.
-              */}
+              {/* Render decorations inside the filtered background so borders/edges match the parchment surface and filters. */}
               {renderDecorations()}
           </div>
 
