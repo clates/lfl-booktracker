@@ -4,3 +4,4 @@ node_modules/
 .backups/
 *.code-workspace
 .eslintrc.json
+tsconfig.tsbuildinfo

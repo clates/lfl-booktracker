@@ -46,12 +46,6 @@ export function Navigation() {
             <span className="text-muted-foreground font-bold text-xl">BookTracker</span>
           </Link>
           <nav className="flex items-center space-x-4">
-            <Button
-              variant={pathname === '/' ? 'default' : 'ghost'}
-              asChild
-            >
-            </Button>
-            
             {user && (
               <Button
                 variant={pathname === '/generate' ? 'default' : 'ghost'}
