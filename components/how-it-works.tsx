@@ -11,13 +11,13 @@ export function HowItWorks() {
     {
       title: "Release It",
       description: "Leave your book in a Little Free Library or pass it to a friend.",
-      image: "/images/heros/boy-book-library.png",
+      image: "/images/heros/boy-book-library-upscale.png",
       alt: "Illustration of a boy placing a book in a library",
     },
     {
       title: "Watch It Go",
       description: "Get notified when someone finds your book and continues its journey.",
-      image: "/images/heros/magnify.png",
+      image: "/images/heros/magnify-upscale.png",
       alt: "Illustration of a magnifying glass",
     },
   ];
