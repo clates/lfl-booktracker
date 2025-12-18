@@ -39,8 +39,8 @@ export function Navigation() {
 
   return (
     <header className="relative z-50">
-      <ParchmentFrame variant="wavy" className="rounded-none border-b-0">
-        <div className="container mx-auto px-4 py-3 flex items-center justify-between">
+      <ParchmentFrame variant="wavy" className="rounded-none border-b-0 p-3">
+        <div className="container mx-auto px-4 flex items-center justify-between">
           <Link href="/" className="flex items-center space-x-2">
             <BookOpen className="h-6 w-6" />
             <span className="text-muted-foreground font-bold text-xl">TaleTrail</span>
@@ -81,7 +81,7 @@ export function Navigation() {
                 variant={pathname === '/login' ? 'default' : 'ghost'}
                 asChild
               >
-                <Link href="/login">
+                <Link href="/login" className="text-muted-foreground">
                   <LogIn className="mr-2 h-4 w-4" />
                   Login
                 </Link>

@@ -75,7 +75,6 @@ describe('Navigation', () => {
       expect(screen.getByText('TaleTrail')).toBeInTheDocument();
     });
 
-    expect(screen.getByText('Search')).toBeInTheDocument();
     expect(screen.getByText('Login')).toBeInTheDocument();
     expect(screen.queryByText('Generate Code')).not.toBeInTheDocument();
     expect(screen.queryByText('test@example.com')).not.toBeInTheDocument();

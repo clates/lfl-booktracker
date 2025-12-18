@@ -28,6 +28,7 @@ You will likely start in the main repository root (`/lfl-booktracker`). You MUST
     -   Create feature branches as needed: `git checkout -b feature/your-task-name`.
     -   Do NOT push to `main` directly.
     -   Commit small, regular, meaningful changes. 
+    -   You have access to a github MCP server in order to push your changes and open pull requests.
 
 **YOUR TASK:**
 
