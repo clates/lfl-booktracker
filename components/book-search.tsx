@@ -5,7 +5,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { ParchmentFrame } from '@/components/ui/parchment-frame';
 import { Input } from '@/components/ui/input';
 import {
   Form,
@@ -61,13 +61,12 @@ export function BookSearch({ className, hideTitle = false }: BookSearchProps) {
 
   return (
     <div className="max-w-4xl mx-auto space-y-8">
-      <Card className={className}>
         {!hideTitle && (
-          <CardHeader>
-            <CardTitle>Search Book by Code</CardTitle>
-          </CardHeader>
+            <div className="mb-6 text-center">
+            <h2 className="font-serif text-3xl font-bold text-[#4a3b2a]">Search Book by Code</h2>
+            </div>
         )}
-        <CardContent>
+        <div className="p-2">
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
               <FormField
@@ -78,12 +77,12 @@ export function BookSearch({ className, hideTitle = false }: BookSearchProps) {
                     <FormControl>
                       <div className="flex space-x-2">
                         <Input
-                          placeholder="Enter 9-character code"
+                          placeholder="Enter book code"
                           {...field}
-                          className="uppercase"
+                          className="lowercase bg-white/50 border-[#d6cba0] focus-visible:ring-[#8b4513]"
                         />
-                        <Button type="submit" disabled={isLoading}>
-                          Search
+                        <Button type="submit" disabled={isLoading} >
+                          Add sighting
                         </Button>
                       </div>
                     </FormControl>
@@ -93,8 +92,7 @@ export function BookSearch({ className, hideTitle = false }: BookSearchProps) {
               />
             </form>
           </Form>
-        </CardContent>
-      </Card>
+        </div>
 
       {bookData && <BookResults book={bookData.book} sightings={bookData.sightings} />}
     </div>
