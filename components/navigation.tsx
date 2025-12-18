@@ -43,7 +43,7 @@ export function Navigation() {
         <div className="container mx-auto px-4 py-3 flex items-center justify-between">
           <Link href="/" className="flex items-center space-x-2">
             <BookOpen className="h-6 w-6" />
-            <span className="font-bold text-xl">BookTracker</span>
+            <span className="text-muted-foreground font-bold text-xl">TaleTrail</span>
           </Link>
           <nav className="flex items-center space-x-4">
             <Button

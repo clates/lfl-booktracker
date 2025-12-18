@@ -18,7 +18,7 @@ const crimson = Crimson_Text({
 });
 
 export const metadata: Metadata = {
-  title: 'BookTracker',
+  title: 'TaleTrail',
   description: 'Track and generate book codes',
 };
 
