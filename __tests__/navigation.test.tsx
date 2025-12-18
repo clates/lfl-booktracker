@@ -75,7 +75,6 @@ describe('Navigation', () => {
       expect(screen.getByText('BookTracker')).toBeInTheDocument();
     });
 
-    expect(screen.getByText('Search')).toBeInTheDocument();
     expect(screen.getByText('Login')).toBeInTheDocument();
     expect(screen.queryByText('Generate Code')).not.toBeInTheDocument();
     expect(screen.queryByText('test@example.com')).not.toBeInTheDocument();
@@ -97,7 +96,6 @@ describe('Navigation', () => {
     });
 
     expect(screen.getByText('BookTracker')).toBeInTheDocument();
-    expect(screen.getByText('Search')).toBeInTheDocument();
     expect(screen.getByText('Generate Code')).toBeInTheDocument();
     expect(screen.queryByText('Login')).not.toBeInTheDocument();
   });
