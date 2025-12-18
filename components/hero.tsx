@@ -8,10 +8,10 @@ export function Hero() {
         <div className="flex flex-col items-center space-y-4 text-center">
           <div className="space-y-2 mb-8">
             <h1 className="font-serif text-4xl font-bold tracking-tighter sm:text-5xl md:text-6xl lg:text-7xl/none text-primary">
-              Where does your book journey begin?
+              Add to this book's story
             </h1>
             <p className="mx-auto max-w-[700px] text-muted-foreground md:text-xl font-serif italic text-lg">
-              Track your book's travels, discover its story, and share the joy of reading.
+              Log your location to update the history, and see where this book has been.
             </p>
           </div>
           <div className="w-full max-w-sm md:max-w-2xl space-y-2">
