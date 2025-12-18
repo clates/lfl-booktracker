@@ -72,7 +72,7 @@ describe('Navigation', () => {
     render(<Navigation />);
 
     await waitFor(() => {
-      expect(screen.getByText('BookTracker')).toBeInTheDocument();
+      expect(screen.getByText('TaleTrail')).toBeInTheDocument();
     });
 
     expect(screen.getByText('Search')).toBeInTheDocument();
@@ -96,7 +96,7 @@ describe('Navigation', () => {
       expect(screen.getByText('test@example.com')).toBeInTheDocument();
     });
 
-    expect(screen.getByText('BookTracker')).toBeInTheDocument();
+    expect(screen.getByText('TaleTrail')).toBeInTheDocument();
     expect(screen.getByText('Search')).toBeInTheDocument();
     expect(screen.getByText('Generate Code')).toBeInTheDocument();
     expect(screen.queryByText('Login')).not.toBeInTheDocument();

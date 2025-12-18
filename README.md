@@ -1,92 +1,95 @@
-# BookTracker
+# TaleTrail
 
 BookTracker is a Next.js application designed to track books as they travel between readers, specifically tailored for Little Free Libraries (LFL). Think of it as "Where's George" but for little libraries. It allows users to register books, generate unique tracking codes, and view a book's journey through "sightings".
 
-## Features
+## Tech Stack
 
-- **Generate Unique Book Codes**: Register a new book by searching the Open Library database. The app automatically fetches metadata (Title, Author, Cover) and generates a unique 9-character code (e.g., `ABC-DEF-GHI`).
-- **Track Books**: Users can enter a book's code to view its details and travel history.
-- **Location Awareness**: Captures geolocation data when registering books to map their journey.
-- **Open Library Integration**: Seamlessly searches and retrieves book information from [Open Library](https://openlibrary.org/).
-- **Responsive Design**: Built with a mobile-first approach using Tailwind CSS and Radix UI primitives.
-
-## Technlogy Stack
-
-- **Framework**: [Next.js 13](https://nextjs.org/) (App Router)
-- **Language**: [TypeScript](https://www.typescriptlang.org/)
-- **Styling**: [Tailwind CSS](https://tailwindcss.com/)
-- **UI Components**: [Shadcn UI](https://ui.shadcn.com/) (based on Radix UI)
-- **Form Handling**: [React Hook Form](https://react-hook-form.com/) with [Zod](https://zod.dev/) validation
-- **Backend/Database**: [Supabase](https://supabase.com/)
-- **Icons**: [Lucide React](https://lucide.dev/)
+*   **Framework:** Next.js (App Router)
+*   **Language:** TypeScript
+*   **Styling:** Tailwind CSS, Shadcn/UI
+*   **Database:** Supabase (PostgreSQL)
+*   **Authentication:** Supabase Auth (Email/Password, OAuth providers: Google, GitHub, Twitter, Instagram) - *Configured for local development*
+*   **Mapping:** Leaflet/React-Leaflet
+*   **Testing:** Jest, React Testing Library
+*   **Deployment:** Vercel
 
 ## Getting Started
 
-Follow these steps to set up the project locally.
-
 ### Prerequisites
 
-- Node.js (v18 or higher)
-- npm or yarn
+*   Node.js (LTS version recommended)
+*   npm or yarn or pnpm
+*   Supabase account
 
 ### Installation
 
-1. Clone the repository:
-   ```bash
-   git clone <repository-url>
-   cd lfl-booktracker
-   ```
+1.  **Clone the repository:**
+    ```bash
+    git clone https://github.com/your-username/lfl-booktracker.git
+    cd lfl-booktracker
+    ```
 
-2. Install dependencies:
-   ```bash
-   npm install
-   # or
-   yarn install
-   ```
+2.  **Install dependencies:**
+    ```bash
+    npm install
+    # or
+    yarn install
+    # or
+    pnpm install
+    ```
 
-3. Set up Environment Variables:
-   Create a `.env.local` file in the root directory and add your Supabase credentials. You likely need:
-   ```env
-   NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
-   NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
-   ```
+3.  **Environment Setup:**
+    cp .env.example .env.local
+    Update `.env.local` with your Supabase credentials:
+    ```env
+    NEXT_PUBLIC_SUPABASE_URL=your-supabase-url
+    NEXT_PUBLIC_SUPABASE_ANON_KEY=your-supabase-anon-key
+    ```
+    Based on recent verification, `DB_KEY` is also used for code generation API:
+    ```env
+    DB_KEY=your-service-role-key # Keep this secret!
+    ```
 
-4. Run the development server:
-   ```bash
-   npm run dev
-   # or
-   yarn dev
-   ```
+4.  **Run the development server:**
+    ```bash
+    npm run dev
+    # or
+    yarn dev
+    # or
+    pnpm dev
+    ```
 
-5. Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-## Usage
-
-### Registering a Book
-1. Navigate to the **Generate Code** page.
-2. Search for a book by Title or ISBN.
-3. Select the correct book from the results.
-4. The app will generate a unique tracking code. Write this code in the book!
-
-### Tracking a Book
-1. Navigate to the **Home** (Search) page.
-2. Enter the 9-character code found in the book.
-3. View the book's details and its history of sightings.
-
-## License
-
-[MIT](LICENSE)
+5.  **Open [http://localhost:3000](http://localhost:3000)** in your browser.
 
 ## Testing
 
-This project uses [Jest](https://jestjs.io/) for unit testing.
-
-To run the test suite:
+Run the test suite with:
 
 ```bash
-npm run test
-# or
 yarn test
 ```
 
-Tests are located in the `__tests__` directory and mirror the project structure.
+Specific test instructions:
+- `yarn test __tests__/geohash.test.ts` for Geohash logic.
+- `yarn test __tests__/openLibrary.test.ts` for Book cover API.
+- `yarn test __tests__/book-api.test.ts` for Book API endpoints.
+
+## Authentication (Local Setup)
+
+Authentication uses Supabase. To test sign-in flow locally:
+1. Ensure your `.env.local` has valid Supabase keys.
+2. Sign up a user through the `/login` page (or Supabase dashboard).
+3. Confirm email (if enabled) or disable email confirmation in Supabase.
+4. Sign in to access protected routes like `/generate`.
+
+## Features (Current)
+
+*   **Book Registration:** Generate a unique 9-character code for your book.
+*   **Code Generation:** Securely generates unique codes using backend logic.
+*   **Book Search:** Look up a book's history by its code.
+*   **Sightings:** Record where you found a book (Location support pending).
+*   **Cover Search:** Find book covers via Google Books API integration.
+
+## License
+
+MIT
