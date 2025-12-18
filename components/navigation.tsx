@@ -42,14 +42,17 @@ export function Navigation() {
       <ParchmentFrame variant="wavy" className="rounded-none border-b-0 p-3">
         <div className="container mx-auto px-4 flex items-center justify-between">
           <Link href="/" className="flex items-center space-x-2">
-            <BookOpen className="text-muted-foreground h-6 w-6" />
-            <span className="text-muted-foreground font-bold text-xl">BookTracker</span>
+            <BookOpen className="h-6 w-6" />
+            <span className="text-muted-foreground font-bold text-xl">TaleTrail</span>
           </Link>
           <nav className="flex items-center space-x-4">
             <Button
               variant={pathname === '/' ? 'default' : 'ghost'}
               asChild
             >
+              <Link href="/">
+                Search
+              </Link>
             </Button>
             
             {user && (
