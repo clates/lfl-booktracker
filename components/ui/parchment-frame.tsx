@@ -24,7 +24,8 @@ export function ParchmentFrame({
       wavy: "text-stone-900 p-8",
   };
 
-  // Surface styles (background, border, shadow, filter) - applied to the background layer
+  // Surface styles (background, border, shadow, filter) applied to a separate background layer.
+  // Filtered variants use this layer so visual filters do not affect the foreground text content.
   const surfaceClasses = {
     default: "bg-[#fdfbf7] border border-[#e6e2d3] rounded-sm shadow-sm",
     ragged: `
@@ -87,18 +88,7 @@ export function ParchmentFrame({
 
   return (
     <div className="relative group">
-       <svg className="absolute w-0 h-0 pointer-events-none">
-        <defs>
-          <filter id="paper-edge-rough" x="-20%" y="-20%" width="140%" height="140%">
-            <feTurbulence type="fractalNoise" baseFrequency="0.04" numOctaves="5" result="noise" />
-            <feDisplacementMap in="SourceGraphic" in2="noise" scale="12" />
-          </filter>
-          <filter id="paper-edge-wavy" x="-20%" y="-20%" width="140%" height="140%">
-            <feTurbulence type="turbulence" baseFrequency="0.01" numOctaves="3" result="noise" />
-            <feDisplacementMap in="SourceGraphic" in2="noise" scale="8" />
-          </filter>
-        </defs>
-      </svg>
+
 
       <div
         className={cn(containerStyles, contentStyles[variant], className)}
@@ -110,6 +100,7 @@ export function ParchmentFrame({
             className={cn("absolute inset-0 -z-10", surfaceClasses[variant])}
             style={isFiltered ? filterStyle : undefined}
           >
+              {/* Render decorations inside the filtered background so borders/edges match the parchment surface and filters. */}
               {renderDecorations()}
           </div>
 

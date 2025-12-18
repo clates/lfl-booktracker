@@ -1,4 +1,5 @@
 import Image from 'next/image';
+import { ParchmentFrame } from '@/components/ui/parchment-frame';
 
 export function HowItWorks() {
   const steps = [
@@ -23,35 +24,35 @@ export function HowItWorks() {
   ];
 
   return (
-    <section className="w-full py-12 md:py-24 lg:py-32 bg-background rounded-lg my-8">
-      <div className="container px-4 md:px-6 mx-auto">
-        <div className="flex flex-col items-center justify-center space-y-4 text-center">
-          <div className="space-y-2">
-            <h2 className="font-serif text-3xl font-bold tracking-tighter sm:text-5xl text-primary">How It Works</h2>
-            <p className="max-w-[900px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed font-serif italic">
-              Join the community of book lovers tracking the journey of their favorite stories.
-            </p>
-          </div>
-        </div>
-        <div className="mx-auto grid max-w-5xl items-start gap-6 py-12 lg:grid-cols-3 lg:gap-12">
-          {steps.map((step, index) => (
-            <div key={index} className="flex flex-col items-center space-y-4 text-center">
-              <div className="relative h-48 w-48 mb-4">
-                <Image
-                  src={step.image}
-                  alt={step.alt}
-                  fill
-                  className="object-contain"
-                />
-              </div>
-              <div className="space-y-2">
-                <h3 className="font-serif text-2xl font-bold text-primary">{step.title}</h3>
-                <p className="text-muted-foreground">{step.description}</p>
-              </div>
+    <div className="w-full py-12 md:py-24 lg:py-32 my-8 px-4">
+        <ParchmentFrame variant="wavy" className="container mx-auto">
+            <div className="flex flex-col items-center justify-center space-y-4 text-center">
+                <div className="space-y-2">
+                    <h2 className="font-serif text-3xl font-bold tracking-tighter sm:text-5xl text-primary">How It Works</h2>
+                    <p className="max-w-[900px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed font-serif italic">
+                    Join the community of book lovers tracking the journey of their favorite stories.
+                    </p>
+                </div>
             </div>
-          ))}
-        </div>
-      </div>
-    </section>
+            <div className="mx-auto grid max-w-5xl items-start gap-6 py-12 lg:grid-cols-3 lg:gap-12">
+            {steps.map((step, index) => (
+                <div key={index} className="flex flex-col items-center space-y-4 text-center">
+                    <div className="relative h-48 w-48 mb-4">
+                        <Image
+                        src={step.image}
+                        alt={step.alt}
+                        fill
+                        className="object-contain"
+                        />
+                    </div>
+                <div className="space-y-2">
+                    <h3 className="font-serif text-2xl font-bold text-primary">{step.title}</h3>
+                    <p className="text-muted-foreground">{step.description}</p>
+                </div>
+                </div>
+            ))}
+            </div>
+        </ParchmentFrame>
+    </div>
   );
 }

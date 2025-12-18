@@ -7,10 +7,10 @@ export function Hero() {
       <div className="container px-4 md:px-6 mx-auto">
         <div className="flex flex-col items-center space-y-4 text-center">
           <div className="space-y-2 mb-8">
-            <h1 className="text-4xl font-bold tracking-tighter sm:text-5xl md:text-6xl lg:text-7xl/none">
+            <h1 className="font-serif text-4xl font-bold tracking-tighter sm:text-5xl md:text-6xl lg:text-7xl/none text-primary">
               Where does your book journey begin?
             </h1>
-            <p className="mx-auto max-w-[700px] text-muted-foreground md:text-xl italic text-lg">
+            <p className="mx-auto max-w-[700px] text-muted-foreground md:text-xl font-serif italic text-lg">
               Track your book's travels, discover its story, and share the joy of reading.
             </p>
           </div>
