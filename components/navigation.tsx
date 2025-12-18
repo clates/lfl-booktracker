@@ -8,6 +8,7 @@ import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import { useEffect, useState, useMemo } from 'react';
 import type { User as SupabaseUser } from '@supabase/supabase-js';
 import { toast } from 'sonner';
+import { ParchmentFrame } from '@/components/ui/parchment-frame';
 
 export function Navigation() {
   const pathname = usePathname();
@@ -37,56 +38,58 @@ export function Navigation() {
   };
 
   return (
-    <header className="border-b">
-      <div className="container mx-auto px-4 py-3 flex items-center justify-between">
-        <Link href="/" className="flex items-center space-x-2">
-          <BookOpen className="h-6 w-6" />
-          <span className="font-bold text-xl">BookTracker</span>
-        </Link>
-        <nav className="flex items-center space-x-4">
-          <Button
-            variant={pathname === '/' ? 'default' : 'ghost'}
-            asChild
-          >
-            <Link href="/">
-              Search
-            </Link>
-          </Button>
-          
-          {user && (
+    <header className="relative z-50">
+      <ParchmentFrame variant="wavy" className="rounded-none border-b-0">
+        <div className="container mx-auto px-4 py-3 flex items-center justify-between">
+          <Link href="/" className="flex items-center space-x-2">
+            <BookOpen className="h-6 w-6" />
+            <span className="font-bold text-xl">BookTracker</span>
+          </Link>
+          <nav className="flex items-center space-x-4">
             <Button
-              variant={pathname === '/generate' ? 'default' : 'ghost'}
+              variant={pathname === '/' ? 'default' : 'ghost'}
               asChild
             >
-              <Link href="/generate">
-                <PlusCircle className="mr-2 h-4 w-4" />
-                Generate Code
+              <Link href="/">
+                Search
               </Link>
             </Button>
-          )}
-
-          {user ? (
-            <div className="flex items-center gap-2">
-              <span className="text-sm text-muted-foreground hidden md:inline-block">
-                {user.email}
-              </span>
-              <Button variant="ghost" size="icon" onClick={handleSignOut} title="Sign Out">
-                <LogOut className="h-4 w-4" />
+            
+            {user && (
+              <Button
+                variant={pathname === '/generate' ? 'default' : 'ghost'}
+                asChild
+              >
+                <Link href="/generate">
+                  <PlusCircle className="mr-2 h-4 w-4" />
+                  Generate Code
+                </Link>
               </Button>
-            </div>
-          ) : (
-            <Button
-              variant={pathname === '/login' ? 'default' : 'ghost'}
-              asChild
-            >
-              <Link href="/login">
-                <LogIn className="mr-2 h-4 w-4" />
-                Login
-              </Link>
-            </Button>
-          )}
-        </nav>
-      </div>
+            )}
+
+            {user ? (
+              <div className="flex items-center gap-2">
+                <span className="text-sm text-muted-foreground hidden md:inline-block">
+                  {user.email}
+                </span>
+                <Button variant="ghost" size="icon" onClick={handleSignOut} title="Sign Out">
+                  <LogOut className="h-4 w-4" />
+                </Button>
+              </div>
+            ) : (
+              <Button
+                variant={pathname === '/login' ? 'default' : 'ghost'}
+                asChild
+              >
+                <Link href="/login">
+                  <LogIn className="mr-2 h-4 w-4" />
+                  Login
+                </Link>
+              </Button>
+            )}
+          </nav>
+        </div>
+      </ParchmentFrame>
     </header>
   );
 }

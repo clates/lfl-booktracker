@@ -3,6 +3,7 @@ import type { Metadata } from 'next';
 import { Inter, Crimson_Text } from 'next/font/google';
 import { Toaster } from '@/components/ui/toaster';
 import { ThemeProvider } from '@/components/theme-provider';
+import { ParchmentFilters } from '@/components/ui/parchment-filters';
 import { Navigation } from '@/components/navigation';
 import { Footer } from '@/components/footer';
 import { cookies } from 'next/headers';
@@ -49,6 +50,7 @@ export default async function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={`${inter.variable} ${crimson.variable} font-sans`}>
+        <ParchmentFilters />
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
