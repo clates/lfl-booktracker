@@ -57,11 +57,22 @@ export function LedgerList({ sightings }: LedgerListProps) {
                   />
                 </div>
                 <div className="flex flex-col gap-1">
-                  <h3 className="font-semibold text-sm leading-tight line-clamp-2">{book.title}</h3>
-                  <p className="text-xs text-muted-foreground">{book.author}</p>
-                  <p className="text-[10px] text-muted-foreground/70 uppercase tracking-widest mt-1">
-                    {new Date(sighting.created_at).toLocaleDateString()}
-                  </p>
+                  <span className="font-bold text-sm line-clamp-1 text-[#2c1810]">
+                    {sighting.book?.title}
+                  </span>
+                  <span className="text-xs text-[#5d4037] line-clamp-1 italic">
+                    {sighting.book?.author}
+                  </span>
+                  <div className="flex flex-col mt-0.5 gap-0.5">
+                    <span className="text-[10px] text-[#8b4513]">in {sighting.location}</span>
+                    <span className="text-[10px] text-[#8b4513]/80">
+                      by{" "}
+                      {sighting.user?.email ? sighting.user.email.split("@")[0] : "Anonymous User"}
+                    </span>
+                    <span className="text-[10px] text-[#8b4513]/60">
+                      {new Date(sighting.created_at).toLocaleDateString()}
+                    </span>
+                  </div>
                 </div>
               </div>
             )

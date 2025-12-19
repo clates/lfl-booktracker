@@ -2,7 +2,7 @@ import { BookSearch } from "@/components/book-search"
 
 export function Hero() {
   return (
-    <section className="w-full py-12 md:py-24 lg:py-32 xl:py-48 bg-gradient-to-b from-primary/10 via-background to-transparent">
+    <section className="w-full py-6 md:py-12 lg:py-16 xl:py-20 bg-gradient-to-b from-primary/10 via-background to-transparent">
       <div className="container px-4 md:px-6 mx-auto">
         <div className="flex flex-col items-center space-y-4 text-center">
           <div className="space-y-2 mb-8">

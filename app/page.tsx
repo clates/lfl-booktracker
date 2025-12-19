@@ -18,8 +18,27 @@ export default async function Home() {
   }
 
   // Cast the data to our type, assuming the join worked as expected.
+  const rawSightings = (sightingsData || []) as unknown as SightingWithBook[]
+
+  // Manually fetch user info if user_id is present (since we can't easily join auth.users)
+  const sightings = await Promise.all(
+    rawSightings.map(async (sighting) => {
+      if (sighting.user_id) {
+        const { data: userData } = await adminSupabase.auth.admin.getUserById(sighting.user_id)
+        if (userData.user) {
+          return {
+            ...sighting,
+            user: {
+              email: userData.user.email || "",
+            },
+          }
+        }
+      }
+      return sighting
+    })
+  )
+
   // We need to reverse for display (Oldest -> Newest) because the feed will process them in order
-  const sightings = (sightingsData || []) as unknown as SightingWithBook[]
   const sortedSightings = [...sightings].reverse()
 
   return (
