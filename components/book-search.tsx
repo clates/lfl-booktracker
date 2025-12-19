@@ -1,56 +1,50 @@
-'use client';
+"use client"
 
-import { useState } from 'react';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm } from 'react-hook-form';
-import * as z from 'zod';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormMessage,
-} from '@/components/ui/form';
-import { BookResults } from '@/components/book-results';
-import { useToast } from '@/hooks/use-toast';
-import type { Book, Sighting } from '@/lib/types';
+import { useState } from "react"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { useForm } from "react-hook-form"
+import * as z from "zod"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Input } from "@/components/ui/input"
+import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form"
+import { BookResults } from "@/components/book-results"
+import { useToast } from "@/hooks/use-toast"
+import type { Book, Sighting } from "@/lib/types"
 
 const formSchema = z.object({
-  code: z.string().length(9, 'Code must be exactly 9 characters'),
-});
+  code: z.string().length(9, "Code must be exactly 9 characters"),
+})
 
 export function BookSearch() {
-  const [bookData, setBookData] = useState<{ book: Book; sightings: Sighting[] } | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
-  const { toast } = useToast();
+  const [bookData, setBookData] = useState<{ book: Book; sightings: Sighting[] } | null>(null)
+  const [isLoading, setIsLoading] = useState(false)
+  const { toast } = useToast()
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      code: '',
+      code: "",
     },
-  });
+  })
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    setIsLoading(true);
+    setIsLoading(true)
     try {
-      const response = await fetch(`/api/books/${values.code}`);
+      const response = await fetch(`/api/books/${values.code}`)
       if (!response.ok) {
-        throw new Error('Book not found');
+        throw new Error("Book not found")
       }
-      const data = await response.json();
-      setBookData(data);
+      const data = await response.json()
+      setBookData(data)
     } catch (error) {
       toast({
-        title: 'Error',
-        description: 'Failed to fetch book data. Please try again.',
-        variant: 'destructive',
-      });
+        title: "Error",
+        description: "Failed to fetch book data. Please try again.",
+        variant: "destructive",
+      })
     } finally {
-      setIsLoading(false);
+      setIsLoading(false)
     }
   }
 
@@ -91,5 +85,5 @@ export function BookSearch() {
 
       {bookData && <BookResults book={bookData.book} sightings={bookData.sightings} />}
     </div>
-  );
+  )
 }

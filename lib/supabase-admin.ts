@@ -1,4 +1,4 @@
-import { createClient } from '@supabase/supabase-js';
+import { createClient } from "@supabase/supabase-js"
 
 // Centralized Admin Client for explicit server-side privileged operations.
 // Bypasses RLS. Use with caution.
@@ -11,4 +11,4 @@ export const adminSupabase = createClient(
       autoRefreshToken: false,
     },
   }
-);
+)

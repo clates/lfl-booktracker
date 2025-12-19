@@ -1,5 +1,5 @@
-import { BookSearch } from '@/components/book-search';
+import { BookSearch } from "@/components/book-search"
 
 export default function Home() {
-  return <BookSearch />;
+  return <BookSearch />
 }

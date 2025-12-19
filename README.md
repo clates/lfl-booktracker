@@ -32,12 +32,14 @@ Follow these steps to set up the project locally.
 ### Installation
 
 1. Clone the repository:
+
    ```bash
    git clone <repository-url>
    cd lfl-booktracker
    ```
 
 2. Install dependencies:
+
    ```bash
    npm install
    # or
@@ -46,12 +48,14 @@ Follow these steps to set up the project locally.
 
 3. Set up Environment Variables:
    Create a `.env.local` file in the root directory and add your Supabase credentials. You likely need:
+
    ```env
    NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
    NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
    ```
 
 4. Run the development server:
+
    ```bash
    npm run dev
    # or
@@ -63,12 +67,14 @@ Follow these steps to set up the project locally.
 ## Usage
 
 ### Registering a Book
+
 1. Navigate to the **Generate Code** page.
 2. Search for a book by Title or ISBN.
 3. Select the correct book from the results.
 4. The app will generate a unique tracking code. Write this code in the book!
 
 ### Tracking a Book
+
 1. Navigate to the **Home** (Search) page.
 2. Enter the 9-character code found in the book.
 3. View the book's details and its history of sightings.

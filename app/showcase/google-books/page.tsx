@@ -1,4 +1,3 @@
-
 import { GoogleBookSearch } from "@/components/google-book-search"
 
 export default function GoogleBooksShowcasePage() {
@@ -10,9 +9,9 @@ export default function GoogleBooksShowcasePage() {
           Demonstrating the type-ahead search component with horizontal shelf layout.
         </p>
       </div>
-      
+
       <div className="p-6 border rounded-xl bg-card">
-         <GoogleBookSearch />
+        <GoogleBookSearch />
       </div>
     </div>
   )

@@ -1,8 +1,8 @@
-'use client';
+"use client"
 
-import { useState } from 'react';
-import { format } from 'date-fns';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { useState } from "react"
+import { format } from "date-fns"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import {
   Table,
   TableBody,
@@ -10,53 +10,53 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table';
-import { Button } from '@/components/ui/button';
-import { useToast } from '@/hooks/use-toast';
-import type { Book, Sighting } from '@/lib/types';
+} from "@/components/ui/table"
+import { Button } from "@/components/ui/button"
+import { useToast } from "@/hooks/use-toast"
+import type { Book, Sighting } from "@/lib/types"
 
 interface BookResultsProps {
-  book: Book;
-  sightings: Sighting[];
+  book: Book
+  sightings: Sighting[]
 }
 
 export function BookResults({ book, sightings: initialSightings }: BookResultsProps) {
-  const [sightings, setSightings] = useState(initialSightings);
-  const [isLoading, setIsLoading] = useState(false);
-  const { toast } = useToast();
+  const [sightings, setSightings] = useState(initialSightings)
+  const [isLoading, setIsLoading] = useState(false)
+  const { toast } = useToast()
 
   async function recordHit() {
-    setIsLoading(true);
+    setIsLoading(true)
     try {
-      const response = await fetch('/api/sightings', {
-        method: 'POST',
+      const response = await fetch("/api/sightings", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           bookId: book.id,
-          location: 'Current Location', // In a real app, this would be dynamic
+          location: "Current Location", // In a real app, this would be dynamic
         }),
-      });
+      })
 
       if (!response.ok) {
-        throw new Error('Failed to record hit');
+        throw new Error("Failed to record hit")
       }
 
-      const newHit = await response.json();
-      setSightings([newHit, ...sightings]);
+      const newHit = await response.json()
+      setSightings([newHit, ...sightings])
       toast({
-        title: 'Success',
-        description: 'Hit recorded successfully',
-      });
+        title: "Success",
+        description: "Hit recorded successfully",
+      })
     } catch (error) {
       toast({
-        title: 'Error',
-        description: 'Failed to record hit. Please try again.',
-        variant: 'destructive',
-      });
+        title: "Error",
+        description: "Failed to record hit. Please try again.",
+        variant: "destructive",
+      })
     } finally {
-      setIsLoading(false);
+      setIsLoading(false)
     }
   }
 
@@ -93,11 +93,9 @@ export function BookResults({ book, sightings: initialSightings }: BookResultsPr
             <TableBody>
               {sightings.map((hit) => (
                 <TableRow key={hit.id}>
-                  <TableCell>{hit.user?.email || 'Anonymous'}</TableCell>
+                  <TableCell>{hit.user?.email || "Anonymous"}</TableCell>
                   <TableCell>{hit.location}</TableCell>
-                  <TableCell>
-                    {format(new Date(hit.created_at), 'PPp')}
-                  </TableCell>
+                  <TableCell>{format(new Date(hit.created_at), "PPp")}</TableCell>
                 </TableRow>
               ))}
             </TableBody>
@@ -105,5 +103,5 @@ export function BookResults({ book, sightings: initialSightings }: BookResultsPr
         </div>
       </CardContent>
     </Card>
-  );
+  )
 }
