@@ -3,7 +3,6 @@
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Sighting } from "@/lib/types" // Assuming we can use or extend this
 import Image from "next/image"
-import { useState, useEffect } from "react"
 
 // We need an extended type because the basic Sighting type might not have the joined book data.
 // Based on the query: .select('*, books(*)') -> returns 'books' property or .select('*, book:books(*)') returns 'book'
@@ -27,24 +26,8 @@ interface LedgerListProps {
 }
 
 export function LedgerList({ sightings }: LedgerListProps) {
-  const [displayedSightings, setDisplayedSightings] = useState<SightingWithBook[]>([])
-  const [currentIndex, setCurrentIndex] = useState(0)
-
-  useEffect(() => {
-    // If we've shown all sightings, stop.
-    if (currentIndex >= sightings.length) return
-
-    const timer = setInterval(() => {
-      setDisplayedSightings((prev) => {
-        const nextItem = sightings[currentIndex]
-        // Prepend new item to appear at the top
-        return [nextItem, ...prev]
-      })
-      setCurrentIndex((prev) => prev + 1)
-    }, 5000)
-
-    return () => clearInterval(timer)
-  }, [currentIndex, sightings])
+  // Logic lifted to parent SightingsFeed.
+  // Rendering the passed prop directly.
 
   return (
     <div className="w-full h-[500px] flex flex-col bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 rounded-xl border shadow-xl overflow-hidden">
@@ -54,7 +37,7 @@ export function LedgerList({ sightings }: LedgerListProps) {
       </div>
       <ScrollArea className="flex-1 p-4">
         <div className="space-y-4 pr-4">
-          {displayedSightings.map((sighting) => {
+          {sightings.map((sighting) => {
             // Handle case where book might is missing or joined differently, but typing helps.
             const book = sighting.book
             if (!book) return null
@@ -83,7 +66,7 @@ export function LedgerList({ sightings }: LedgerListProps) {
               </div>
             )
           })}
-          {displayedSightings.length === 0 && (
+          {sightings.length === 0 && (
             <div className="text-center text-muted-foreground py-8 animate-pulse">
               Listening for drops...
             </div>
