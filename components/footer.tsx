@@ -1,6 +1,5 @@
-
-import Link from 'next/link';
-import { ParchmentFrame } from '@/components/ui/parchment-frame';
+import Link from "next/link"
+import { ParchmentFrame } from "@/components/ui/parchment-frame"
 
 export function Footer() {
   return (
@@ -11,12 +10,15 @@ export function Footer() {
             © {new Date().getFullYear()} TaleTrail. Built with ♥ for book lovers.
           </p>
           <div className="flex items-center gap-4">
-            <Link href="/privacy" className="text-sm font-medium underline underline-offset-4 hover:text-primary">
+            <Link
+              href="/privacy"
+              className="text-sm font-medium underline underline-offset-4 hover:text-primary"
+            >
               Privacy Policy (Ultra Informal: We don't want your data!)
             </Link>
           </div>
         </div>
       </ParchmentFrame>
     </footer>
-  );
+  )
 }

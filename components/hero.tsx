@@ -1,5 +1,4 @@
-
-import { BookSearch } from '@/components/book-search';
+import { BookSearch } from "@/components/book-search"
 
 export function Hero() {
   return (
@@ -20,5 +19,5 @@ export function Hero() {
         </div>
       </div>
     </section>
-  );
+  )
 }
