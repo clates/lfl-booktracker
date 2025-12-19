@@ -1,41 +1,45 @@
-'use client';
+"use client"
 
-import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
-import { Button } from '@/components/ui/button';
-import { BookOpen, PlusCircle, LogIn, LogOut } from 'lucide-react';
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
-import { useEffect, useState, useMemo } from 'react';
-import type { User as SupabaseUser } from '@supabase/supabase-js';
-import { toast } from 'sonner';
-import { ParchmentFrame } from '@/components/ui/parchment-frame';
+import Link from "next/link"
+import { usePathname, useRouter } from "next/navigation"
+import { Button } from "@/components/ui/button"
+import { BookOpen, PlusCircle, LogIn, LogOut } from "lucide-react"
+import { createClientComponentClient } from "@supabase/auth-helpers-nextjs"
+import { useEffect, useState, useMemo } from "react"
+import type { User as SupabaseUser } from "@supabase/supabase-js"
+import { toast } from "sonner"
+import { ParchmentFrame } from "@/components/ui/parchment-frame"
 
 export function Navigation() {
-  const pathname = usePathname();
-  const router = useRouter();
-  const [user, setUser] = useState<SupabaseUser | null>(null);
-  const supabase = useMemo(() => createClientComponentClient(), []);
+  const pathname = usePathname()
+  const router = useRouter()
+  const [user, setUser] = useState<SupabaseUser | null>(null)
+  const supabase = useMemo(() => createClientComponentClient(), [])
 
   useEffect(() => {
     const getUser = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      setUser(session?.user ?? null);
-    };
+      const {
+        data: { session },
+      } = await supabase.auth.getSession()
+      setUser(session?.user ?? null)
+    }
 
-    getUser();
+    getUser()
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null);
-    });
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null)
+    })
 
-    return () => subscription.unsubscribe();
-  }, [supabase]);
+    return () => subscription.unsubscribe()
+  }, [supabase])
 
   const handleSignOut = async () => {
-    await supabase.auth.signOut();
-    router.refresh();
-    toast.success('Signed out successfully');
-  };
+    await supabase.auth.signOut()
+    router.refresh()
+    toast.success("Signed out successfully")
+  }
 
   return (
     <header className="relative z-50">
@@ -46,20 +50,12 @@ export function Navigation() {
             <span className="text-muted-foreground font-bold text-xl">TaleTrail</span>
           </Link>
           <nav className="flex items-center space-x-4">
-            <Button
-              variant={pathname === '/' ? 'default' : 'ghost'}
-              asChild
-            >
-              <Link href="/">
-                Search
-              </Link>
+            <Button variant={pathname === "/" ? "default" : "ghost"} asChild>
+              <Link href="/">Search</Link>
             </Button>
-            
+
             {user && (
-              <Button
-                variant={pathname === '/generate' ? 'default' : 'ghost'}
-                asChild
-              >
+              <Button variant={pathname === "/generate" ? "default" : "ghost"} asChild>
                 <Link href="/generate">
                   <PlusCircle className="mr-2 h-4 w-4" />
                   Generate Code
@@ -77,10 +73,7 @@ export function Navigation() {
                 </Button>
               </div>
             ) : (
-              <Button
-                variant={pathname === '/login' ? 'default' : 'ghost'}
-                asChild
-              >
+              <Button variant={pathname === "/login" ? "default" : "ghost"} asChild>
                 <Link href="/login" className="text-muted-foreground">
                   <LogIn className="mr-2 h-4 w-4" />
                   Login
@@ -91,5 +84,5 @@ export function Navigation() {
         </div>
       </ParchmentFrame>
     </header>
-  );
+  )
 }
