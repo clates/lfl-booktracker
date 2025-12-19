@@ -4,6 +4,7 @@ import { MapContainer, TileLayer, Marker, Popup, useMapEvents } from "react-leaf
 import "leaflet/dist/leaflet.css"
 import { useEffect, useState } from "react"
 import L from "leaflet"
+import { SightingWithBook } from "@/components/ledger-list"
 
 function LocationMarker() {
   const [position, setPosition] = useState(L.latLng(0, 0))
@@ -35,8 +36,14 @@ function LocationMarker() {
   )
 }
 
-export default function HomeMap() {
-  const bookIcon = new L.Icon({
+interface HomeMapProps {
+  sightings: SightingWithBook[]
+}
+
+export default function HomeMap({ sightings }: HomeMapProps) {
+  // Use a different icon for sightings if available, or the same one.
+  // Using the standard book marker for sightings.
+  const sightingIcon = new L.Icon({
     iconUrl: "/images/maps/book-marker.png",
     iconRetinaUrl: "/images/maps/book-marker.png",
     iconSize: [32, 32],
@@ -69,6 +76,21 @@ export default function HomeMap() {
           url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png"
         />
         <LocationMarker />
+        {sightings.map((sighting) => {
+          if (sighting.lat && sighting.lon) {
+            return (
+              <Marker key={sighting.id} position={[sighting.lat, sighting.lon]} icon={sightingIcon}>
+                <Popup>
+                  <div className="flex flex-col gap-1">
+                    <span className="font-bold text-sm">{sighting.book?.title}</span>
+                    <span className="text-xs">{sighting.book?.author}</span>
+                  </div>
+                </Popup>
+              </Marker>
+            )
+          }
+          return null
+        })}
       </MapContainer>
     </div>
   )
