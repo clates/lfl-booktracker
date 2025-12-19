@@ -13,8 +13,9 @@ export default function Home() {
       />
       <main className="min-h-screen">
         <Hero />
-        <div className="container mx-auto px-4">
+        <div className="container flex flex-row mx-auto px-4 gap-16">
           <HomeMapWrapper />
+          <div className="flex flex-col w-full">log</div>
         </div>
         <HowItWorks />
       </main>

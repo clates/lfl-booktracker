@@ -18,19 +18,39 @@ function LocationMarker() {
   })
 
   return position === null ? null : (
-    <Marker position={position}>
+    <Marker
+      position={position}
+      icon={
+        new L.Icon({
+          iconUrl: "/images/maps/book-marker.png",
+          iconRetinaUrl: "/images/maps/book-marker.png",
+          iconSize: [32, 32],
+          iconAnchor: [16, 32],
+          popupAnchor: [0, -32],
+        })
+      }
+    >
       <Popup>You are here</Popup>
     </Marker>
   )
 }
 
 export default function HomeMap() {
+  const bookIcon = new L.Icon({
+    iconUrl: "/images/maps/book-marker.png",
+    iconRetinaUrl: "/images/maps/book-marker.png",
+    iconSize: [32, 32],
+    iconAnchor: [16, 32],
+    popupAnchor: [0, -32],
+  })
+
+  // Set default icon to our book icon
   useEffect(() => {
     // @ts-ignore
     delete L.Icon.Default.prototype._getIconUrl
     L.Icon.Default.mergeOptions({
-      iconUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
-      iconRetinaUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png",
+      iconUrl: "/images/maps/book-marker.png",
+      iconRetinaUrl: "/images/maps/book-marker.png",
       shadowUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
     })
   }, [])
@@ -38,14 +58,15 @@ export default function HomeMap() {
   return (
     <div className="h-[400px] w-full my-8 rounded-xl overflow-hidden border-4 border-[#8b4513] shadow-xl flex items-center justify-center bg-secondary">
       <MapContainer
-        center={[51.505, -0.09]}
+        // Herndon Fortnightly Library - 38.97188332537304, -77.38713321966762
+        center={[38.971, -77.387]}
         zoom={13}
         scrollWheelZoom={false}
         style={{ height: "100%", width: "100%" }}
       >
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png"
         />
         <LocationMarker />
       </MapContainer>
