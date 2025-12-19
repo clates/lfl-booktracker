@@ -25,9 +25,10 @@ export const metadata: Metadata = {
 export const dynamic = "force-dynamic"
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
-  const cookieStore = cookies()
+  const cookieStore = await cookies()
   // Ensure we use the ANON key for client operations to respect RLS
   const supabase = createServerComponentClient(
+    // @ts-expect-error - The library expects a Promise based on types but the implementation is synchronous
     { cookies: () => cookieStore },
     {
       supabaseUrl: process.env.NEXT_PUBLIC_SUPABASE_URL,

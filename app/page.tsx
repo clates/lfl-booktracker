@@ -1,5 +1,6 @@
 import { Hero } from "@/components/hero"
 import { HowItWorks } from "@/components/how-it-works"
+import { HomeMapWrapper } from "@/components/home-map-wrapper"
 
 export default function Home() {
   return (
@@ -12,6 +13,9 @@ export default function Home() {
       />
       <main className="min-h-screen">
         <Hero />
+        <div className="container mx-auto px-4">
+          <HomeMapWrapper />
+        </div>
         <HowItWorks />
       </main>
     </>

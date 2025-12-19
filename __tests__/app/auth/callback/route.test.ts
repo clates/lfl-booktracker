@@ -70,7 +70,7 @@ describe("GET /auth/callback", () => {
     // Check status code which should be 307 for redirect
     expect(response.status).toBe(307)
     // Check Location header (NextResponse.redirect adds trailing slash to origin)
-    expect(response.headers.get("Location")).toBe("http://localhost:3000/")
+    expect(response.headers.get("Location")).toBe("http://localhost:3000")
   })
 
   it("skips code exchange when code parameter is missing", async () => {
@@ -87,7 +87,7 @@ describe("GET /auth/callback", () => {
     const response = await GET(request)
 
     expect(response.status).toBe(307)
-    expect(response.headers.get("Location")).toBe("http://localhost:3000/")
+    expect(response.headers.get("Location")).toBe("http://localhost:3000")
   })
 
   it("handles code exchange errors gracefully", async () => {
@@ -102,7 +102,7 @@ describe("GET /auth/callback", () => {
 
     expect(mockExchangeCodeForSession).toHaveBeenCalledWith("invalid-code")
     expect(response.status).toBe(307)
-    expect(response.headers.get("Location")).toBe("http://localhost:3000/")
+    expect(response.headers.get("Location")).toBe("http://localhost:3000")
   })
 
   it("preserves origin URL with different domains", async () => {
@@ -113,7 +113,7 @@ describe("GET /auth/callback", () => {
     const response = await GET(request)
 
     expect(response.status).toBe(307)
-    expect(response.headers.get("Location")).toBe("https://example.com/")
+    expect(response.headers.get("Location")).toBe("https://example.com")
   })
 
   it("preserves origin URL with different ports", async () => {
@@ -124,6 +124,6 @@ describe("GET /auth/callback", () => {
     const response = await GET(request)
 
     expect(response.status).toBe(307)
-    expect(response.headers.get("Location")).toBe("http://localhost:8080/")
+    expect(response.headers.get("Location")).toBe("http://localhost:8080")
   })
 })
