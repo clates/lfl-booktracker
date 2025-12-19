@@ -74,7 +74,10 @@ export default function HomeMap({ sightings }: HomeMapProps) {
             return (
               <Marker key={sighting.id} position={[sighting.lat, sighting.lon]} icon={sightingIcon}>
                 <Popup>
-                  <div className="flex flex-col gap-1">
+                  <div
+                    className="flex flex-col gap-1"
+                    aria-label={`Location of ${sighting.book?.title}`}
+                  >
                     <span className="font-bold text-sm">{sighting.book?.title}</span>
                     <span className="text-xs">{sighting.book?.author}</span>
                   </div>

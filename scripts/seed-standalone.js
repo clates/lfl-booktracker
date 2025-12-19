@@ -1,7 +1,7 @@
 const { createClient } = require("@supabase/supabase-js")
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-const supabaseKey = process.env.DB_KEY
+const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY
 
 if (!supabaseUrl || !supabaseKey) {
   console.error("Missing Supabase credentials in environment.")
@@ -72,7 +72,7 @@ async function fetchGoogleBooks() {
               cover: cover,
             }
           })
-          .filter((b) => b !== null)
+          .filter((book) => book !== null)
         allBooks = [...allBooks, ...books]
       }
     } catch (e) {
@@ -80,8 +80,11 @@ async function fetchGoogleBooks() {
     }
   }
 
-  // Shuffle
-  allBooks.sort(() => Math.random() - 0.5)
+  // Fisher-Yates Shuffle
+  for (let i = allBooks.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1))
+    ;[allBooks[i], allBooks[j]] = [allBooks[j], allBooks[i]]
+  }
   // Unique by title to avoid duplicates
   const uniqueBooks = Array.from(new Map(allBooks.map((item) => [item.title, item])).values())
 

@@ -4,7 +4,7 @@ import { createClient } from "@supabase/supabase-js"
 // Bypasses RLS. Use with caution.
 export const adminSupabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.DB_KEY!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.DB_KEY!,
   {
     auth: {
       persistSession: false,

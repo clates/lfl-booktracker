@@ -38,19 +38,19 @@ export function LedgerList({ sightings }: LedgerListProps) {
       <ScrollArea className="flex-1 p-4">
         <div className="space-y-4 pr-4">
           {sightings.map((sighting) => {
-            // Handle case where book might is missing or joined differently, but typing helps.
+            // Handle case where book might be missing or joined differently, but typing helps.
             const book = sighting.book
             if (!book) return null
 
             return (
               <div
                 key={sighting.id}
-                className="flex flex-row gap-4 items-start pb-4 border-b last:border-0 last:pb-0 animate-in slide-in-from-top-4 fade-in duration-700"
+                className="flex flex-row gap-4 items-start pb-4 border-b last:border-0 last:pb-0 transition-all duration-700 ease-out"
               >
                 <div className="relative w-[50px] h-[75px] flex-shrink-0 shadow-sm rounded overflow-hidden bg-muted">
                   <Image
                     src={book.cover_url || "https://placehold.co/40x60?text=No+Cover"}
-                    alt={book.title}
+                    alt={`Book cover for ${book.title}`}
                     fill
                     className="object-cover"
                     sizes="50px"
@@ -58,11 +58,9 @@ export function LedgerList({ sightings }: LedgerListProps) {
                 </div>
                 <div className="flex flex-col gap-1">
                   <span className="font-bold text-sm line-clamp-1 text-[#2c1810]">
-                    {sighting.book?.title}
+                    {book.title}
                   </span>
-                  <span className="text-xs text-[#5d4037] line-clamp-1 italic">
-                    {sighting.book?.author}
-                  </span>
+                  <span className="text-xs text-[#5d4037] line-clamp-1 italic">{book.author}</span>
                   <div className="flex flex-col mt-0.5 gap-0.5">
                     <span className="text-[10px] text-[#8b4513]">in {sighting.location}</span>
                     <span className="text-[10px] text-[#8b4513]/80">

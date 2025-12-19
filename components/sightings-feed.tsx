@@ -13,17 +13,29 @@ export function SightingsFeed({ initialSightings }: SightingsFeedProps) {
   const [currentIndex, setCurrentIndex] = useState(0)
 
   useEffect(() => {
+    const SIGHTING_DISPLAY_INTERVAL_MS = 5000
+
     // If we've shown all sightings, stop.
     if (currentIndex >= initialSightings.length) return
 
     const timer = setInterval(() => {
-      setDisplayedSightings((prev) => {
-        const nextItem = initialSightings[currentIndex]
-        // Prepend new item to appear at the top/newest
-        return [nextItem, ...prev]
+      setCurrentIndex((prevIndex) => {
+        // Stop if we reached the end
+        if (prevIndex >= initialSightings.length) {
+          clearInterval(timer)
+          return prevIndex
+        }
+
+        const nextItem = initialSightings[prevIndex]
+
+        // Safety check if nextItem is undefined (though length check above should prevent this)
+        if (nextItem) {
+          setDisplayedSightings((prevSightings) => [nextItem, ...prevSightings])
+        }
+
+        return prevIndex + 1
       })
-      setCurrentIndex((prev) => prev + 1)
-    }, 5000)
+    }, SIGHTING_DISPLAY_INTERVAL_MS)
 
     return () => clearInterval(timer)
   }, [currentIndex, initialSightings])
