@@ -1,0 +1,1175 @@
+[
+  {
+    "url": "https://api.github.com/repos/clates/lfl-booktracker/pulls/comments/2633772622",
+    "pull_request_review_id": 3596999137,
+    "id": 2633772622,
+    "node_id": "PRRC_kwDONLllc86c_C5O",
+    "diff_hunk": "@@ -1,8 +1,46 @@\n import { Hero } from \"@/components/hero\"\n import { HowItWorks } from \"@/components/how-it-works\"\n-import { HomeMapWrapper } from \"@/components/home-map-wrapper\"\n+import { adminSupabase } from \"@/lib/supabase-admin\"\n+import { SightingWithBook } from \"@/components/ledger-list\"\n+import { SightingsFeed } from \"@/components/sightings-feed\"\n+\n+export const dynamic = \"force-dynamic\"\n+\n+export default async function Home() {\n+  const { data: sightingsData, error } = await adminSupabase\n+    .from(\"sightings\")\n+    .select(\"*, book:books(*)\")\n+    .order(\"created_at\", { ascending: false })\n+    .limit(25)\n+\n+  if (error) {\n+    console.error(\"Error fetching sightings:\", error)",
+    "path": "app/page.tsx",
+    "commit_id": "42114370876f310f6e498c27f38a4dbd7a5b0570",
+    "original_commit_id": "42114370876f310f6e498c27f38a4dbd7a5b0570",
+    "user": {
+      "login": "Copilot",
+      "id": 175728472,
+      "node_id": "BOT_kgDOCnlnWA",
+      "avatar_url": "https://avatars.githubusercontent.com/in/946600?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/Copilot",
+      "html_url": "https://github.com/apps/copilot-pull-request-reviewer",
+      "followers_url": "https://api.github.com/users/Copilot/followers",
+      "following_url": "https://api.github.com/users/Copilot/following{/other_user}",
+      "gists_url": "https://api.github.com/users/Copilot/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/Copilot/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/Copilot/subscriptions",
+      "organizations_url": "https://api.github.com/users/Copilot/orgs",
+      "repos_url": "https://api.github.com/users/Copilot/repos",
+      "events_url": "https://api.github.com/users/Copilot/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/Copilot/received_events",
+      "type": "Bot",
+      "user_view_type": "public",
+      "site_admin": false
+    },
+    "body": "Silent error handling: When an error occurs fetching sightings, it's logged to console but the page continues to render with an empty array. Users won't see any indication that data failed to load. Consider displaying an error message or error state to inform users when data fetching fails.\n```suggestion\n    console.error(\"Error fetching sightings:\", error)\n    return (\n      <>\n        <div\n          className=\"fixed inset-0 -z-10 opacity-25 blur-[1px]\"\n          style={{\n            backgroundImage: \"url('/images/background/lfl-background-edited.png')\",\n          }}\n        />\n        <main className=\"min-h-screen\">\n          <Hero />\n          <section className=\"mx-auto max-w-3xl px-4 py-8 text-center\">\n            <h2 className=\"text-lg font-semibold text-red-600\">\n              Error loading recent sightings\n            </h2>\n            <p className=\"mt-2 text-sm text-gray-700\">\n              We&apos;re having trouble fetching the latest sightings right now. Please try again\n              in a few moments.\n            </p>\n          </section>\n          <HowItWorks />\n        </main>\n      </>\n    )\n```",
+    "created_at": "2025-12-19T06:00:36Z",
+    "updated_at": "2025-12-19T06:00:42Z",
+    "html_url": "https://github.com/clates/lfl-booktracker/pull/25#discussion_r2633772622",
+    "pull_request_url": "https://api.github.com/repos/clates/lfl-booktracker/pulls/25",
+    "_links": {
+      "self": {
+        "href": "https://api.github.com/repos/clates/lfl-booktracker/pulls/comments/2633772622"
+      },
+      "html": {
+        "href": "https://github.com/clates/lfl-booktracker/pull/25#discussion_r2633772622"
+      },
+      "pull_request": {
+        "href": "https://api.github.com/repos/clates/lfl-booktracker/pulls/25"
+      }
+    },
+    "reactions": {
+      "url": "https://api.github.com/repos/clates/lfl-booktracker/pulls/comments/2633772622/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "start_line": null,
+    "original_start_line": null,
+    "start_side": null,
+    "line": 17,
+    "original_line": 17,
+    "side": "RIGHT",
+    "author_association": "CONTRIBUTOR",
+    "original_position": 18,
+    "position": 18,
+    "subject_type": "line"
+  },
+  {
+    "url": "https://api.github.com/repos/clates/lfl-booktracker/pulls/comments/2633772644",
+    "pull_request_review_id": 3596999137,
+    "id": 2633772644,
+    "node_id": "PRRC_kwDONLllc86c_C5k",
+    "diff_hunk": "@@ -0,0 +1,43 @@\n+\"use client\"\n+\n+import { useState, useEffect } from \"react\"\n+import { SightingWithBook, LedgerList } from \"@/components/ledger-list\"\n+import { HomeMapWrapper } from \"@/components/home-map-wrapper\"\n+\n+interface SightingsFeedProps {\n+  initialSightings: SightingWithBook[]\n+}\n+\n+export function SightingsFeed({ initialSightings }: SightingsFeedProps) {\n+  const [displayedSightings, setDisplayedSightings] = useState<SightingWithBook[]>([])\n+  const [currentIndex, setCurrentIndex] = useState(0)\n+\n+  useEffect(() => {\n+    // If we've shown all sightings, stop.\n+    if (currentIndex >= initialSightings.length) return\n+\n+    const timer = setInterval(() => {\n+      setDisplayedSightings((prev) => {\n+        const nextItem = initialSightings[currentIndex]\n+        // Prepend new item to appear at the top/newest\n+        return [nextItem, ...prev]\n+      })\n+      setCurrentIndex((prev) => prev + 1)\n+    }, 5000)",
+    "path": "components/sightings-feed.tsx",
+    "commit_id": "42114370876f310f6e498c27f38a4dbd7a5b0570",
+    "original_commit_id": "42114370876f310f6e498c27f38a4dbd7a5b0570",
+    "user": {
+      "login": "Copilot",
+      "id": 175728472,
+      "node_id": "BOT_kgDOCnlnWA",
+      "avatar_url": "https://avatars.githubusercontent.com/in/946600?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/Copilot",
+      "html_url": "https://github.com/apps/copilot-pull-request-reviewer",
+      "followers_url": "https://api.github.com/users/Copilot/followers",
+      "following_url": "https://api.github.com/users/Copilot/following{/other_user}",
+      "gists_url": "https://api.github.com/users/Copilot/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/Copilot/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/Copilot/subscriptions",
+      "organizations_url": "https://api.github.com/users/Copilot/orgs",
+      "repos_url": "https://api.github.com/users/Copilot/repos",
+      "events_url": "https://api.github.com/users/Copilot/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/Copilot/received_events",
+      "type": "Bot",
+      "user_view_type": "public",
+      "site_admin": false
+    },
+    "body": "Magic number without explanation: The timer interval of 5000ms (5 seconds) is hardcoded without explanation. Consider extracting this to a named constant (e.g., `SIGHTING_DISPLAY_INTERVAL_MS`) to improve code readability and make it easier to adjust this timing in the future.",
+    "created_at": "2025-12-19T06:00:36Z",
+    "updated_at": "2025-12-19T06:00:42Z",
+    "html_url": "https://github.com/clates/lfl-booktracker/pull/25#discussion_r2633772644",
+    "pull_request_url": "https://api.github.com/repos/clates/lfl-booktracker/pulls/25",
+    "_links": {
+      "self": {
+        "href": "https://api.github.com/repos/clates/lfl-booktracker/pulls/comments/2633772644"
+      },
+      "html": {
+        "href": "https://github.com/clates/lfl-booktracker/pull/25#discussion_r2633772644"
+      },
+      "pull_request": {
+        "href": "https://api.github.com/repos/clates/lfl-booktracker/pulls/25"
+      }
+    },
+    "reactions": {
+      "url": "https://api.github.com/repos/clates/lfl-booktracker/pulls/comments/2633772644/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "start_line": null,
+    "original_start_line": null,
+    "start_side": null,
+    "line": 26,
+    "original_line": 26,
+    "side": "RIGHT",
+    "author_association": "CONTRIBUTOR",
+    "original_position": 26,
+    "position": 26,
+    "subject_type": "line"
+  },
+  {
+    "url": "https://api.github.com/repos/clates/lfl-booktracker/pulls/comments/2633772656",
+    "pull_request_review_id": 3596999137,
+    "id": 2633772656,
+    "node_id": "PRRC_kwDONLllc86c_C5w",
+    "diff_hunk": "@@ -0,0 +1,35 @@\n+const { createClient } = require(\"@supabase/supabase-js\")\n+\n+const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.DB_KEY, {\n+  auth: {\n+    persistSession: false,\n+    autoRefreshToken: false,\n+  },\n+})",
+    "path": "scripts/verify-sightings.js",
+    "commit_id": "42114370876f310f6e498c27f38a4dbd7a5b0570",
+    "original_commit_id": "42114370876f310f6e498c27f38a4dbd7a5b0570",
+    "user": {
+      "login": "Copilot",
+      "id": 175728472,
+      "node_id": "BOT_kgDOCnlnWA",
+      "avatar_url": "https://avatars.githubusercontent.com/in/946600?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/Copilot",
+      "html_url": "https://github.com/apps/copilot-pull-request-reviewer",
+      "followers_url": "https://api.github.com/users/Copilot/followers",
+      "following_url": "https://api.github.com/users/Copilot/following{/other_user}",
+      "gists_url": "https://api.github.com/users/Copilot/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/Copilot/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/Copilot/subscriptions",
+      "organizations_url": "https://api.github.com/users/Copilot/orgs",
+      "repos_url": "https://api.github.com/users/Copilot/repos",
+      "events_url": "https://api.github.com/users/Copilot/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/Copilot/received_events",
+      "type": "Bot",
+      "user_view_type": "public",
+      "site_admin": false
+    },
+    "body": "Inconsistent environment variable naming: The script uses `process.env.DB_KEY` on line 3, but based on other files in the codebase (like lib/supabase-admin.ts), this should likely be a service role key or admin key. The variable name `DB_KEY` is ambiguous - it's unclear whether this is a database connection string, an API key, or a service role key. Consider using a more descriptive name like `SUPABASE_SERVICE_ROLE_KEY` for clarity.\n```suggestion\nconst supabase = createClient(\n  process.env.NEXT_PUBLIC_SUPABASE_URL,\n  process.env.SUPABASE_SERVICE_ROLE_KEY,\n  {\n    auth: {\n      persistSession: false,\n      autoRefreshToken: false,\n    },\n  }\n)\n```",
+    "created_at": "2025-12-19T06:00:37Z",
+    "updated_at": "2025-12-19T06:00:42Z",
+    "html_url": "https://github.com/clates/lfl-booktracker/pull/25#discussion_r2633772656",
+    "pull_request_url": "https://api.github.com/repos/clates/lfl-booktracker/pulls/25",
+    "_links": {
+      "self": {
+        "href": "https://api.github.com/repos/clates/lfl-booktracker/pulls/comments/2633772656"
+      },
+      "html": {
+        "href": "https://github.com/clates/lfl-booktracker/pull/25#discussion_r2633772656"
+      },
+      "pull_request": {
+        "href": "https://api.github.com/repos/clates/lfl-booktracker/pulls/25"
+      }
+    },
+    "reactions": {
+      "url": "https://api.github.com/repos/clates/lfl-booktracker/pulls/comments/2633772656/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "start_line": 3,
+    "original_start_line": 3,
+    "start_side": "RIGHT",
+    "line": 8,
+    "original_line": 8,
+    "side": "RIGHT",
+    "author_association": "CONTRIBUTOR",
+    "original_position": 8,
+    "position": 8,
+    "subject_type": "line"
+  },
+  {
+    "url": "https://api.github.com/repos/clates/lfl-booktracker/pulls/comments/2633772664",
+    "pull_request_review_id": 3596999137,
+    "id": 2633772664,
+    "node_id": "PRRC_kwDONLllc86c_C54",
+    "diff_hunk": "@@ -0,0 +1,89 @@\n+\"use client\"\n+\n+import { ScrollArea } from \"@/components/ui/scroll-area\"\n+import { Sighting } from \"@/lib/types\" // Assuming we can use or extend this\n+import Image from \"next/image\"\n+\n+// We need an extended type because the basic Sighting type might not have the joined book data.\n+// Based on the query: .select('*, books(*)') -> returns 'books' property or .select('*, book:books(*)') returns 'book'\n+// The user request example had .select('*, books(*)')\n+// I'll assume we map it to a comfortable structure or use the raw result.\n+// Let's define the prop type clearly.\n+\n+export type SightingWithBook = Sighting & {\n+  book: {\n+    title: string\n+    author: string\n+    cover_url?: string\n+  } | null\n+}\n+// Note: Supabase join via books(*) usually returns an object if it's many-to-one, or array if one-to-many.\n+// sightings.book_id -> books.id. This is Many-to-One (Sighting belongs to Book).\n+// So 'books' should be a single object (or null).\n+\n+interface LedgerListProps {\n+  sightings: SightingWithBook[]\n+}\n+\n+export function LedgerList({ sightings }: LedgerListProps) {\n+  // Logic lifted to parent SightingsFeed.\n+  // Rendering the passed prop directly.\n+\n+  return (\n+    <div className=\"w-full h-[500px] flex flex-col bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 rounded-xl border shadow-xl overflow-hidden\">\n+      <div className=\"p-4 border-b bg-muted/50\">\n+        <h2 className=\"font-serif text-xl font-bold\">Recent Sightings</h2>\n+        <p className=\"text-xs text-muted-foreground\">Live activity from the community</p>\n+      </div>\n+      <ScrollArea className=\"flex-1 p-4\">\n+        <div className=\"space-y-4 pr-4\">\n+          {sightings.map((sighting) => {\n+            // Handle case where book might is missing or joined differently, but typing helps.\n+            const book = sighting.book\n+            if (!book) return null\n+\n+            return (\n+              <div\n+                key={sighting.id}\n+                className=\"flex flex-row gap-4 items-start pb-4 border-b last:border-0 last:pb-0 animate-in slide-in-from-top-4 fade-in duration-700\"\n+              >\n+                <div className=\"relative w-[50px] h-[75px] flex-shrink-0 shadow-sm rounded overflow-hidden bg-muted\">\n+                  <Image\n+                    src={book.cover_url || \"https://placehold.co/40x60?text=No+Cover\"}\n+                    alt={book.title}\n+                    fill\n+                    className=\"object-cover\"\n+                    sizes=\"50px\"\n+                  />\n+                </div>\n+                <div className=\"flex flex-col gap-1\">\n+                  <span className=\"font-bold text-sm line-clamp-1 text-[#2c1810]\">\n+                    {sighting.book?.title}\n+                  </span>\n+                  <span className=\"text-xs text-[#5d4037] line-clamp-1 italic\">\n+                    {sighting.book?.author}",
+    "path": "components/ledger-list.tsx",
+    "commit_id": "42114370876f310f6e498c27f38a4dbd7a5b0570",
+    "original_commit_id": "42114370876f310f6e498c27f38a4dbd7a5b0570",
+    "user": {
+      "login": "Copilot",
+      "id": 175728472,
+      "node_id": "BOT_kgDOCnlnWA",
+      "avatar_url": "https://avatars.githubusercontent.com/in/946600?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/Copilot",
+      "html_url": "https://github.com/apps/copilot-pull-request-reviewer",
+      "followers_url": "https://api.github.com/users/Copilot/followers",
+      "following_url": "https://api.github.com/users/Copilot/following{/other_user}",
+      "gists_url": "https://api.github.com/users/Copilot/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/Copilot/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/Copilot/subscriptions",
+      "organizations_url": "https://api.github.com/users/Copilot/orgs",
+      "repos_url": "https://api.github.com/users/Copilot/repos",
+      "events_url": "https://api.github.com/users/Copilot/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/Copilot/received_events",
+      "type": "Bot",
+      "user_view_type": "public",
+      "site_admin": false
+    },
+    "body": "Redundant optional chaining: `sighting.book` is already accessed and null-checked on line 42-43 where we early return if it's falsy. Using `sighting.book?.title` here is redundant since we know `book` exists at this point. The same issue exists for accessing the author on line 64. Consider using `book.title` and `book.author` directly since the variable is already available and validated.\n```suggestion\n                    {book.title}\n                  </span>\n                  <span className=\"text-xs text-[#5d4037] line-clamp-1 italic\">\n                    {book.author}\n```",
+    "created_at": "2025-12-19T06:00:37Z",
+    "updated_at": "2025-12-19T06:00:42Z",
+    "html_url": "https://github.com/clates/lfl-booktracker/pull/25#discussion_r2633772664",
+    "pull_request_url": "https://api.github.com/repos/clates/lfl-booktracker/pulls/25",
+    "_links": {
+      "self": {
+        "href": "https://api.github.com/repos/clates/lfl-booktracker/pulls/comments/2633772664"
+      },
+      "html": {
+        "href": "https://github.com/clates/lfl-booktracker/pull/25#discussion_r2633772664"
+      },
+      "pull_request": {
+        "href": "https://api.github.com/repos/clates/lfl-booktracker/pulls/25"
+      }
+    },
+    "reactions": {
+      "url": "https://api.github.com/repos/clates/lfl-booktracker/pulls/comments/2633772664/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "start_line": 61,
+    "original_start_line": 61,
+    "start_side": "RIGHT",
+    "line": 64,
+    "original_line": 64,
+    "side": "RIGHT",
+    "author_association": "CONTRIBUTOR",
+    "original_position": 64,
+    "position": 64,
+    "subject_type": "line"
+  },
+  {
+    "url": "https://api.github.com/repos/clates/lfl-booktracker/pulls/comments/2633772676",
+    "pull_request_review_id": 3596999137,
+    "id": 2633772676,
+    "node_id": "PRRC_kwDONLllc86c_C6E",
+    "diff_hunk": "@@ -0,0 +1,43 @@\n+\"use client\"\n+\n+import { useState, useEffect } from \"react\"\n+import { SightingWithBook, LedgerList } from \"@/components/ledger-list\"\n+import { HomeMapWrapper } from \"@/components/home-map-wrapper\"\n+\n+interface SightingsFeedProps {\n+  initialSightings: SightingWithBook[]\n+}\n+\n+export function SightingsFeed({ initialSightings }: SightingsFeedProps) {\n+  const [displayedSightings, setDisplayedSightings] = useState<SightingWithBook[]>([])\n+  const [currentIndex, setCurrentIndex] = useState(0)\n+\n+  useEffect(() => {\n+    // If we've shown all sightings, stop.\n+    if (currentIndex >= initialSightings.length) return\n+\n+    const timer = setInterval(() => {\n+      setDisplayedSightings((prev) => {\n+        const nextItem = initialSightings[currentIndex]\n+        // Prepend new item to appear at the top/newest\n+        return [nextItem, ...prev]\n+      })\n+      setCurrentIndex((prev) => prev + 1)",
+    "path": "components/sightings-feed.tsx",
+    "commit_id": "42114370876f310f6e498c27f38a4dbd7a5b0570",
+    "original_commit_id": "42114370876f310f6e498c27f38a4dbd7a5b0570",
+    "user": {
+      "login": "Copilot",
+      "id": 175728472,
+      "node_id": "BOT_kgDOCnlnWA",
+      "avatar_url": "https://avatars.githubusercontent.com/in/946600?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/Copilot",
+      "html_url": "https://github.com/apps/copilot-pull-request-reviewer",
+      "followers_url": "https://api.github.com/users/Copilot/followers",
+      "following_url": "https://api.github.com/users/Copilot/following{/other_user}",
+      "gists_url": "https://api.github.com/users/Copilot/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/Copilot/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/Copilot/subscriptions",
+      "organizations_url": "https://api.github.com/users/Copilot/orgs",
+      "repos_url": "https://api.github.com/users/Copilot/repos",
+      "events_url": "https://api.github.com/users/Copilot/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/Copilot/received_events",
+      "type": "Bot",
+      "user_view_type": "public",
+      "site_admin": false
+    },
+    "body": "Accessing array element without bounds checking: When `currentIndex` equals `initialSightings.length - 1` and the timer fires, incrementing currentIndex to `initialSightings.length` will cause `initialSightings[currentIndex]` on line 21 to be undefined. This undefined value will be prepended to the displayed sightings array, potentially causing rendering issues.\n```suggestion\n      setCurrentIndex((prevIndex) => {\n        // If we've reached or passed the end, clear the timer and stop updating.\n        if (prevIndex >= initialSightings.length) {\n          clearInterval(timer)\n          return prevIndex\n        }\n\n        // Use the current index value safely within bounds.\n        const nextItem = initialSightings[prevIndex]\n        setDisplayedSightings((prevSightings) => {\n          // Prepend new item to appear at the top/newest\n          return [nextItem, ...prevSightings]\n        })\n\n        // Advance to the next index for the next tick.\n        return prevIndex + 1\n      })\n```",
+    "created_at": "2025-12-19T06:00:37Z",
+    "updated_at": "2025-12-19T06:00:42Z",
+    "html_url": "https://github.com/clates/lfl-booktracker/pull/25#discussion_r2633772676",
+    "pull_request_url": "https://api.github.com/repos/clates/lfl-booktracker/pulls/25",
+    "_links": {
+      "self": {
+        "href": "https://api.github.com/repos/clates/lfl-booktracker/pulls/comments/2633772676"
+      },
+      "html": {
+        "href": "https://github.com/clates/lfl-booktracker/pull/25#discussion_r2633772676"
+      },
+      "pull_request": {
+        "href": "https://api.github.com/repos/clates/lfl-booktracker/pulls/25"
+      }
+    },
+    "reactions": {
+      "url": "https://api.github.com/repos/clates/lfl-booktracker/pulls/comments/2633772676/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "start_line": 20,
+    "original_start_line": 20,
+    "start_side": "RIGHT",
+    "line": 25,
+    "original_line": 25,
+    "side": "RIGHT",
+    "author_association": "CONTRIBUTOR",
+    "original_position": 25,
+    "position": 25,
+    "subject_type": "line"
+  },
+  {
+    "url": "https://api.github.com/repos/clates/lfl-booktracker/pulls/comments/2633772682",
+    "pull_request_review_id": 3596999137,
+    "id": 2633772682,
+    "node_id": "PRRC_kwDONLllc86c_C6K",
+    "diff_hunk": "@@ -1,8 +1,46 @@\n import { Hero } from \"@/components/hero\"\n import { HowItWorks } from \"@/components/how-it-works\"\n-import { HomeMapWrapper } from \"@/components/home-map-wrapper\"\n+import { adminSupabase } from \"@/lib/supabase-admin\"\n+import { SightingWithBook } from \"@/components/ledger-list\"\n+import { SightingsFeed } from \"@/components/sightings-feed\"\n+\n+export const dynamic = \"force-dynamic\"\n+\n+export default async function Home() {\n+  const { data: sightingsData, error } = await adminSupabase\n+    .from(\"sightings\")\n+    .select(\"*, book:books(*)\")\n+    .order(\"created_at\", { ascending: false })\n+    .limit(25)\n+\n+  if (error) {\n+    console.error(\"Error fetching sightings:\", error)\n+  }\n+\n+  // Cast the data to our type, assuming the join worked as expected.\n+  const rawSightings = (sightingsData || []) as unknown as SightingWithBook[]\n+\n+  // Manually fetch user info if user_id is present (since we can't easily join auth.users)\n+  const sightings = await Promise.all(\n+    rawSightings.map(async (sighting) => {\n+      if (sighting.user_id) {\n+        const { data: userData } = await adminSupabase.auth.admin.getUserById(sighting.user_id)\n+        if (userData.user) {\n+          return {\n+            ...sighting,\n+            user: {\n+              email: userData.user.email || \"\",\n+            },\n+          }\n+        }\n+      }\n+      return sighting\n+    })\n+  )",
+    "path": "app/page.tsx",
+    "commit_id": "42114370876f310f6e498c27f38a4dbd7a5b0570",
+    "original_commit_id": "42114370876f310f6e498c27f38a4dbd7a5b0570",
+    "user": {
+      "login": "Copilot",
+      "id": 175728472,
+      "node_id": "BOT_kgDOCnlnWA",
+      "avatar_url": "https://avatars.githubusercontent.com/in/946600?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/Copilot",
+      "html_url": "https://github.com/apps/copilot-pull-request-reviewer",
+      "followers_url": "https://api.github.com/users/Copilot/followers",
+      "following_url": "https://api.github.com/users/Copilot/following{/other_user}",
+      "gists_url": "https://api.github.com/users/Copilot/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/Copilot/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/Copilot/subscriptions",
+      "organizations_url": "https://api.github.com/users/Copilot/orgs",
+      "repos_url": "https://api.github.com/users/Copilot/repos",
+      "events_url": "https://api.github.com/users/Copilot/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/Copilot/received_events",
+      "type": "Bot",
+      "user_view_type": "public",
+      "site_admin": false
+    },
+    "body": "N+1 query pattern: For each sighting, a separate API call is made to fetch user data using `adminSupabase.auth.admin.getUserById()`. With 25 sightings (limit on line 14), this results in up to 25 sequential database calls. This significantly impacts performance. Consider batching user data fetches or restructuring the query to fetch user information more efficiently.\n```suggestion\n  // Collect unique user IDs from the sightings so we can fetch user info in a single query.\n  const userIds = Array.from(\n    new Set(\n      rawSightings\n        .map((sighting) => sighting.user_id)\n        .filter((id): id is string => typeof id === \"string\" && id.length > 0)\n    )\n  )\n\n  // Batch-fetch user info from auth.users for all relevant user IDs.\n  let usersById = new Map<string, { id: string; email: string | null }>()\n  if (userIds.length > 0) {\n    const { data: usersData, error: usersError } = await adminSupabase\n      .from(\"auth.users\")\n      .select(\"id, email\")\n      .in(\"id\", userIds)\n\n    if (usersError) {\n      console.error(\"Error fetching users for sightings:\", usersError)\n    } else if (usersData) {\n      usersById = new Map(usersData.map((user) => [user.id, user]))\n    }\n  }\n\n  // Attach user info to sightings using the pre-fetched user map.\n  const sightings = rawSightings.map((sighting) => {\n    if (sighting.user_id) {\n      const user = usersById.get(sighting.user_id)\n      if (user) {\n        return {\n          ...sighting,\n          user: {\n            email: user.email || \"\",\n          },\n        }\n      }\n    }\n    return sighting\n  })\n```",
+    "created_at": "2025-12-19T06:00:38Z",
+    "updated_at": "2025-12-19T06:00:43Z",
+    "html_url": "https://github.com/clates/lfl-booktracker/pull/25#discussion_r2633772682",
+    "pull_request_url": "https://api.github.com/repos/clates/lfl-booktracker/pulls/25",
+    "_links": {
+      "self": {
+        "href": "https://api.github.com/repos/clates/lfl-booktracker/pulls/comments/2633772682"
+      },
+      "html": {
+        "href": "https://github.com/clates/lfl-booktracker/pull/25#discussion_r2633772682"
+      },
+      "pull_request": {
+        "href": "https://api.github.com/repos/clates/lfl-booktracker/pulls/25"
+      }
+    },
+    "reactions": {
+      "url": "https://api.github.com/repos/clates/lfl-booktracker/pulls/comments/2633772682/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "start_line": 23,
+    "original_start_line": 23,
+    "start_side": "RIGHT",
+    "line": 39,
+    "original_line": 39,
+    "side": "RIGHT",
+    "author_association": "CONTRIBUTOR",
+    "original_position": 40,
+    "position": 40,
+    "subject_type": "line"
+  },
+  {
+    "url": "https://api.github.com/repos/clates/lfl-booktracker/pulls/comments/2633772696",
+    "pull_request_review_id": 3596999137,
+    "id": 2633772696,
+    "node_id": "PRRC_kwDONLllc86c_C6Y",
+    "diff_hunk": "@@ -0,0 +1,152 @@\n+const { createClient } = require(\"@supabase/supabase-js\")\n+\n+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL\n+const supabaseKey = process.env.DB_KEY\n+\n+if (!supabaseUrl || !supabaseKey) {\n+  console.error(\"Missing Supabase credentials in environment.\")\n+  process.exit(1)\n+}\n+\n+const adminSupabase = createClient(supabaseUrl, supabaseKey, {\n+  auth: {\n+    persistSession: false,\n+    autoRefreshToken: false,\n+  },\n+})\n+\n+const LOCATIONS = [\n+  { name: \"Herndon\", lat: 38.9696, lon: -77.3861 },\n+  { name: \"Reston\", lat: 38.9586, lon: -77.357 },\n+  { name: \"Sterling\", lat: 39.0067, lon: -77.4291 },\n+  { name: \"Ashburn\", lat: 39.0438, lon: -77.4874 },\n+]\n+\n+const SEARCH_TERMS = [\n+  \"bestsellers 2024\",\n+  \"classic novels\",\n+  \"science fiction\",\n+  \"mystery thriller\",\n+  \"fantasy books\",\n+  \"biography\",\n+]\n+\n+function getRandomInt(min, max) {\n+  return Math.floor(Math.random() * (max - min + 1)) + min\n+}\n+\n+function getRandomLocation() {\n+  const loc = LOCATIONS[getRandomInt(0, LOCATIONS.length - 1)]\n+  const latJitter = (Math.random() - 0.5) * 0.04\n+  const lonJitter = (Math.random() - 0.5) * 0.04\n+  return {\n+    lat: loc.lat + latJitter,\n+    lon: loc.lon + lonJitter,\n+    name: loc.name,\n+  }\n+}\n+\n+async function fetchGoogleBooks() {\n+  console.log(\"Fetching books from Google Books API...\")\n+  let allBooks = []\n+\n+  for (const term of SEARCH_TERMS) {\n+    try {\n+      const res = await fetch(\n+        `https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(term)}&maxResults=10&printType=books&langRestrict=en`\n+      )\n+      if (!res.ok) continue\n+      const data = await res.json()\n+      if (data.items) {\n+        const books = data.items\n+          .map((item) => {\n+            const info = item.volumeInfo\n+            let cover = info.imageLinks?.thumbnail || info.imageLinks?.smallThumbnail\n+            if (cover) cover = cover.replace(\"http:\", \"https:\")\n+\n+            if (!info.title || !info.authors || !cover) return null\n+\n+            return {\n+              title: info.title,\n+              author: info.authors[0],\n+              cover: cover,\n+            }\n+          })\n+          .filter((b) => b !== null)",
+    "path": "scripts/seed-standalone.js",
+    "commit_id": "42114370876f310f6e498c27f38a4dbd7a5b0570",
+    "original_commit_id": "42114370876f310f6e498c27f38a4dbd7a5b0570",
+    "user": {
+      "login": "Copilot",
+      "id": 175728472,
+      "node_id": "BOT_kgDOCnlnWA",
+      "avatar_url": "https://avatars.githubusercontent.com/in/946600?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/Copilot",
+      "html_url": "https://github.com/apps/copilot-pull-request-reviewer",
+      "followers_url": "https://api.github.com/users/Copilot/followers",
+      "following_url": "https://api.github.com/users/Copilot/following{/other_user}",
+      "gists_url": "https://api.github.com/users/Copilot/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/Copilot/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/Copilot/subscriptions",
+      "organizations_url": "https://api.github.com/users/Copilot/orgs",
+      "repos_url": "https://api.github.com/users/Copilot/repos",
+      "events_url": "https://api.github.com/users/Copilot/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/Copilot/received_events",
+      "type": "Bot",
+      "user_view_type": "public",
+      "site_admin": false
+    },
+    "body": "Variable name `b` is not descriptive. In the filter operation on line 75, using a single-letter variable name reduces code readability. Consider using a more descriptive name like `book` to make the filter operation clearer.\n```suggestion\n          .filter((book) => book !== null)\n```",
+    "created_at": "2025-12-19T06:00:38Z",
+    "updated_at": "2025-12-19T06:00:43Z",
+    "html_url": "https://github.com/clates/lfl-booktracker/pull/25#discussion_r2633772696",
+    "pull_request_url": "https://api.github.com/repos/clates/lfl-booktracker/pulls/25",
+    "_links": {
+      "self": {
+        "href": "https://api.github.com/repos/clates/lfl-booktracker/pulls/comments/2633772696"
+      },
+      "html": {
+        "href": "https://github.com/clates/lfl-booktracker/pull/25#discussion_r2633772696"
+      },
+      "pull_request": {
+        "href": "https://api.github.com/repos/clates/lfl-booktracker/pulls/25"
+      }
+    },
+    "reactions": {
+      "url": "https://api.github.com/repos/clates/lfl-booktracker/pulls/comments/2633772696/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "start_line": null,
+    "original_start_line": null,
+    "start_side": null,
+    "line": 75,
+    "original_line": 75,
+    "side": "RIGHT",
+    "author_association": "CONTRIBUTOR",
+    "original_position": 75,
+    "position": 75,
+    "subject_type": "line"
+  },
+  {
+    "url": "https://api.github.com/repos/clates/lfl-booktracker/pulls/comments/2633772708",
+    "pull_request_review_id": 3596999137,
+    "id": 2633772708,
+    "node_id": "PRRC_kwDONLllc86c_C6k",
+    "diff_hunk": "@@ -0,0 +1,89 @@\n+\"use client\"\n+\n+import { ScrollArea } from \"@/components/ui/scroll-area\"\n+import { Sighting } from \"@/lib/types\" // Assuming we can use or extend this\n+import Image from \"next/image\"\n+\n+// We need an extended type because the basic Sighting type might not have the joined book data.\n+// Based on the query: .select('*, books(*)') -> returns 'books' property or .select('*, book:books(*)') returns 'book'\n+// The user request example had .select('*, books(*)')\n+// I'll assume we map it to a comfortable structure or use the raw result.\n+// Let's define the prop type clearly.\n+\n+export type SightingWithBook = Sighting & {\n+  book: {\n+    title: string\n+    author: string\n+    cover_url?: string\n+  } | null\n+}\n+// Note: Supabase join via books(*) usually returns an object if it's many-to-one, or array if one-to-many.\n+// sightings.book_id -> books.id. This is Many-to-One (Sighting belongs to Book).\n+// So 'books' should be a single object (or null).\n+\n+interface LedgerListProps {\n+  sightings: SightingWithBook[]\n+}\n+\n+export function LedgerList({ sightings }: LedgerListProps) {\n+  // Logic lifted to parent SightingsFeed.\n+  // Rendering the passed prop directly.\n+\n+  return (\n+    <div className=\"w-full h-[500px] flex flex-col bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 rounded-xl border shadow-xl overflow-hidden\">\n+      <div className=\"p-4 border-b bg-muted/50\">\n+        <h2 className=\"font-serif text-xl font-bold\">Recent Sightings</h2>\n+        <p className=\"text-xs text-muted-foreground\">Live activity from the community</p>\n+      </div>\n+      <ScrollArea className=\"flex-1 p-4\">\n+        <div className=\"space-y-4 pr-4\">\n+          {sightings.map((sighting) => {\n+            // Handle case where book might is missing or joined differently, but typing helps.\n+            const book = sighting.book\n+            if (!book) return null\n+\n+            return (\n+              <div\n+                key={sighting.id}\n+                className=\"flex flex-row gap-4 items-start pb-4 border-b last:border-0 last:pb-0 animate-in slide-in-from-top-4 fade-in duration-700\"\n+              >\n+                <div className=\"relative w-[50px] h-[75px] flex-shrink-0 shadow-sm rounded overflow-hidden bg-muted\">\n+                  <Image\n+                    src={book.cover_url || \"https://placehold.co/40x60?text=No+Cover\"}\n+                    alt={book.title}",
+    "path": "components/ledger-list.tsx",
+    "commit_id": "42114370876f310f6e498c27f38a4dbd7a5b0570",
+    "original_commit_id": "42114370876f310f6e498c27f38a4dbd7a5b0570",
+    "user": {
+      "login": "Copilot",
+      "id": 175728472,
+      "node_id": "BOT_kgDOCnlnWA",
+      "avatar_url": "https://avatars.githubusercontent.com/in/946600?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/Copilot",
+      "html_url": "https://github.com/apps/copilot-pull-request-reviewer",
+      "followers_url": "https://api.github.com/users/Copilot/followers",
+      "following_url": "https://api.github.com/users/Copilot/following{/other_user}",
+      "gists_url": "https://api.github.com/users/Copilot/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/Copilot/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/Copilot/subscriptions",
+      "organizations_url": "https://api.github.com/users/Copilot/orgs",
+      "repos_url": "https://api.github.com/users/Copilot/repos",
+      "events_url": "https://api.github.com/users/Copilot/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/Copilot/received_events",
+      "type": "Bot",
+      "user_view_type": "public",
+      "site_admin": false
+    },
+    "body": "Missing alt text fallback: When the book cover image fails to load or is missing, the alt text uses `book.title`, but if `book` is null (which can't happen here due to line 43 guard), the alt would be undefined. While this specific case is protected, the Image component should have more descriptive alt text, such as \"Book cover for [title]\" to better serve screen reader users.\n```suggestion\n                    alt={`Book cover for ${book.title}`}\n```",
+    "created_at": "2025-12-19T06:00:38Z",
+    "updated_at": "2025-12-19T06:00:43Z",
+    "html_url": "https://github.com/clates/lfl-booktracker/pull/25#discussion_r2633772708",
+    "pull_request_url": "https://api.github.com/repos/clates/lfl-booktracker/pulls/25",
+    "_links": {
+      "self": {
+        "href": "https://api.github.com/repos/clates/lfl-booktracker/pulls/comments/2633772708"
+      },
+      "html": {
+        "href": "https://github.com/clates/lfl-booktracker/pull/25#discussion_r2633772708"
+      },
+      "pull_request": {
+        "href": "https://api.github.com/repos/clates/lfl-booktracker/pulls/25"
+      }
+    },
+    "reactions": {
+      "url": "https://api.github.com/repos/clates/lfl-booktracker/pulls/comments/2633772708/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "start_line": null,
+    "original_start_line": null,
+    "start_side": null,
+    "line": 53,
+    "original_line": 53,
+    "side": "RIGHT",
+    "author_association": "CONTRIBUTOR",
+    "original_position": 53,
+    "position": 53,
+    "subject_type": "line"
+  },
+  {
+    "url": "https://api.github.com/repos/clates/lfl-booktracker/pulls/comments/2633772725",
+    "pull_request_review_id": 3596999137,
+    "id": 2633772725,
+    "node_id": "PRRC_kwDONLllc86c_C61",
+    "diff_hunk": "@@ -0,0 +1,89 @@\n+\"use client\"\n+\n+import { ScrollArea } from \"@/components/ui/scroll-area\"\n+import { Sighting } from \"@/lib/types\" // Assuming we can use or extend this\n+import Image from \"next/image\"\n+\n+// We need an extended type because the basic Sighting type might not have the joined book data.\n+// Based on the query: .select('*, books(*)') -> returns 'books' property or .select('*, book:books(*)') returns 'book'\n+// The user request example had .select('*, books(*)')\n+// I'll assume we map it to a comfortable structure or use the raw result.\n+// Let's define the prop type clearly.\n+\n+export type SightingWithBook = Sighting & {\n+  book: {\n+    title: string\n+    author: string\n+    cover_url?: string\n+  } | null\n+}\n+// Note: Supabase join via books(*) usually returns an object if it's many-to-one, or array if one-to-many.\n+// sightings.book_id -> books.id. This is Many-to-One (Sighting belongs to Book).\n+// So 'books' should be a single object (or null).\n+\n+interface LedgerListProps {\n+  sightings: SightingWithBook[]\n+}\n+\n+export function LedgerList({ sightings }: LedgerListProps) {\n+  // Logic lifted to parent SightingsFeed.\n+  // Rendering the passed prop directly.\n+\n+  return (\n+    <div className=\"w-full h-[500px] flex flex-col bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 rounded-xl border shadow-xl overflow-hidden\">\n+      <div className=\"p-4 border-b bg-muted/50\">\n+        <h2 className=\"font-serif text-xl font-bold\">Recent Sightings</h2>\n+        <p className=\"text-xs text-muted-foreground\">Live activity from the community</p>\n+      </div>\n+      <ScrollArea className=\"flex-1 p-4\">\n+        <div className=\"space-y-4 pr-4\">\n+          {sightings.map((sighting) => {\n+            // Handle case where book might is missing or joined differently, but typing helps.\n+            const book = sighting.book\n+            if (!book) return null\n+\n+            return (\n+              <div\n+                key={sighting.id}\n+                className=\"flex flex-row gap-4 items-start pb-4 border-b last:border-0 last:pb-0 animate-in slide-in-from-top-4 fade-in duration-700\"",
+    "path": "components/ledger-list.tsx",
+    "commit_id": "42114370876f310f6e498c27f38a4dbd7a5b0570",
+    "original_commit_id": "42114370876f310f6e498c27f38a4dbd7a5b0570",
+    "user": {
+      "login": "Copilot",
+      "id": 175728472,
+      "node_id": "BOT_kgDOCnlnWA",
+      "avatar_url": "https://avatars.githubusercontent.com/in/946600?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/Copilot",
+      "html_url": "https://github.com/apps/copilot-pull-request-reviewer",
+      "followers_url": "https://api.github.com/users/Copilot/followers",
+      "following_url": "https://api.github.com/users/Copilot/following{/other_user}",
+      "gists_url": "https://api.github.com/users/Copilot/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/Copilot/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/Copilot/subscriptions",
+      "organizations_url": "https://api.github.com/users/Copilot/orgs",
+      "repos_url": "https://api.github.com/users/Copilot/repos",
+      "events_url": "https://api.github.com/users/Copilot/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/Copilot/received_events",
+      "type": "Bot",
+      "user_view_type": "public",
+      "site_admin": false
+    },
+    "body": "Animation classes may not work without Tailwind configuration: The classes `animate-in`, `slide-in-from-top-4`, and `fade-in` on line 48 are Tailwind CSS animation utilities. These require specific Tailwind configuration to work properly. If the project's Tailwind config doesn't include these animation utilities (they're part of tailwindcss-animate or similar plugins), these classes will have no effect. Verify that the necessary Tailwind plugins are installed and configured.\n```suggestion\n                className=\"flex flex-row gap-4 items-start pb-4 border-b last:border-0 last:pb-0 transition-all duration-700 ease-out\"\n```",
+    "created_at": "2025-12-19T06:00:38Z",
+    "updated_at": "2025-12-19T06:00:43Z",
+    "html_url": "https://github.com/clates/lfl-booktracker/pull/25#discussion_r2633772725",
+    "pull_request_url": "https://api.github.com/repos/clates/lfl-booktracker/pulls/25",
+    "_links": {
+      "self": {
+        "href": "https://api.github.com/repos/clates/lfl-booktracker/pulls/comments/2633772725"
+      },
+      "html": {
+        "href": "https://github.com/clates/lfl-booktracker/pull/25#discussion_r2633772725"
+      },
+      "pull_request": {
+        "href": "https://api.github.com/repos/clates/lfl-booktracker/pulls/25"
+      }
+    },
+    "reactions": {
+      "url": "https://api.github.com/repos/clates/lfl-booktracker/pulls/comments/2633772725/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "start_line": null,
+    "original_start_line": null,
+    "start_side": null,
+    "line": 48,
+    "original_line": 48,
+    "side": "RIGHT",
+    "author_association": "CONTRIBUTOR",
+    "original_position": 48,
+    "position": 48,
+    "subject_type": "line"
+  },
+  {
+    "url": "https://api.github.com/repos/clates/lfl-booktracker/pulls/comments/2633772739",
+    "pull_request_review_id": 3596999137,
+    "id": 2633772739,
+    "node_id": "PRRC_kwDONLllc86c_C7D",
+    "diff_hunk": "@@ -0,0 +1,89 @@\n+\"use client\"\n+\n+import { ScrollArea } from \"@/components/ui/scroll-area\"\n+import { Sighting } from \"@/lib/types\" // Assuming we can use or extend this\n+import Image from \"next/image\"\n+\n+// We need an extended type because the basic Sighting type might not have the joined book data.\n+// Based on the query: .select('*, books(*)') -> returns 'books' property or .select('*, book:books(*)') returns 'book'\n+// The user request example had .select('*, books(*)')\n+// I'll assume we map it to a comfortable structure or use the raw result.\n+// Let's define the prop type clearly.\n+\n+export type SightingWithBook = Sighting & {\n+  book: {\n+    title: string\n+    author: string\n+    cover_url?: string\n+  } | null\n+}\n+// Note: Supabase join via books(*) usually returns an object if it's many-to-one, or array if one-to-many.\n+// sightings.book_id -> books.id. This is Many-to-One (Sighting belongs to Book).\n+// So 'books' should be a single object (or null).\n+\n+interface LedgerListProps {\n+  sightings: SightingWithBook[]\n+}\n+\n+export function LedgerList({ sightings }: LedgerListProps) {\n+  // Logic lifted to parent SightingsFeed.\n+  // Rendering the passed prop directly.\n+\n+  return (\n+    <div className=\"w-full h-[500px] flex flex-col bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 rounded-xl border shadow-xl overflow-hidden\">\n+      <div className=\"p-4 border-b bg-muted/50\">\n+        <h2 className=\"font-serif text-xl font-bold\">Recent Sightings</h2>\n+        <p className=\"text-xs text-muted-foreground\">Live activity from the community</p>\n+      </div>\n+      <ScrollArea className=\"flex-1 p-4\">\n+        <div className=\"space-y-4 pr-4\">\n+          {sightings.map((sighting) => {\n+            // Handle case where book might is missing or joined differently, but typing helps.\n+            const book = sighting.book\n+            if (!book) return null\n+\n+            return (\n+              <div\n+                key={sighting.id}\n+                className=\"flex flex-row gap-4 items-start pb-4 border-b last:border-0 last:pb-0 animate-in slide-in-from-top-4 fade-in duration-700\"\n+              >\n+                <div className=\"relative w-[50px] h-[75px] flex-shrink-0 shadow-sm rounded overflow-hidden bg-muted\">\n+                  <Image\n+                    src={book.cover_url || \"https://placehold.co/40x60?text=No+Cover\"}\n+                    alt={book.title}\n+                    fill\n+                    className=\"object-cover\"\n+                    sizes=\"50px\"\n+                  />\n+                </div>\n+                <div className=\"flex flex-col gap-1\">\n+                  <span className=\"font-bold text-sm line-clamp-1 text-[#2c1810]\">\n+                    {sighting.book?.title}\n+                  </span>\n+                  <span className=\"text-xs text-[#5d4037] line-clamp-1 italic\">\n+                    {sighting.book?.author}",
+    "path": "components/ledger-list.tsx",
+    "commit_id": "42114370876f310f6e498c27f38a4dbd7a5b0570",
+    "original_commit_id": "42114370876f310f6e498c27f38a4dbd7a5b0570",
+    "user": {
+      "login": "Copilot",
+      "id": 175728472,
+      "node_id": "BOT_kgDOCnlnWA",
+      "avatar_url": "https://avatars.githubusercontent.com/in/946600?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/Copilot",
+      "html_url": "https://github.com/apps/copilot-pull-request-reviewer",
+      "followers_url": "https://api.github.com/users/Copilot/followers",
+      "following_url": "https://api.github.com/users/Copilot/following{/other_user}",
+      "gists_url": "https://api.github.com/users/Copilot/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/Copilot/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/Copilot/subscriptions",
+      "organizations_url": "https://api.github.com/users/Copilot/orgs",
+      "repos_url": "https://api.github.com/users/Copilot/repos",
+      "events_url": "https://api.github.com/users/Copilot/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/Copilot/received_events",
+      "type": "Bot",
+      "user_view_type": "public",
+      "site_admin": false
+    },
+    "body": "Redundant optional chaining: `sighting.book` is already accessed and null-checked on line 42-43 where we early return if it's falsy. Using `sighting.book?.author` here is redundant since we know `book` exists at this point. Consider using `book.author` directly since the variable is already available and validated.\n```suggestion\n                    {book.title}\n                  </span>\n                  <span className=\"text-xs text-[#5d4037] line-clamp-1 italic\">\n                    {book.author}\n```",
+    "created_at": "2025-12-19T06:00:39Z",
+    "updated_at": "2025-12-19T06:00:43Z",
+    "html_url": "https://github.com/clates/lfl-booktracker/pull/25#discussion_r2633772739",
+    "pull_request_url": "https://api.github.com/repos/clates/lfl-booktracker/pulls/25",
+    "_links": {
+      "self": {
+        "href": "https://api.github.com/repos/clates/lfl-booktracker/pulls/comments/2633772739"
+      },
+      "html": {
+        "href": "https://github.com/clates/lfl-booktracker/pull/25#discussion_r2633772739"
+      },
+      "pull_request": {
+        "href": "https://api.github.com/repos/clates/lfl-booktracker/pulls/25"
+      }
+    },
+    "reactions": {
+      "url": "https://api.github.com/repos/clates/lfl-booktracker/pulls/comments/2633772739/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "start_line": 61,
+    "original_start_line": 61,
+    "start_side": "RIGHT",
+    "line": 64,
+    "original_line": 64,
+    "side": "RIGHT",
+    "author_association": "CONTRIBUTOR",
+    "original_position": 64,
+    "position": 64,
+    "subject_type": "line"
+  },
+  {
+    "url": "https://api.github.com/repos/clates/lfl-booktracker/pulls/comments/2633772760",
+    "pull_request_review_id": 3596999137,
+    "id": 2633772760,
+    "node_id": "PRRC_kwDONLllc86c_C7Y",
+    "diff_hunk": "@@ -1,8 +1,46 @@\n import { Hero } from \"@/components/hero\"\n import { HowItWorks } from \"@/components/how-it-works\"\n-import { HomeMapWrapper } from \"@/components/home-map-wrapper\"\n+import { adminSupabase } from \"@/lib/supabase-admin\"\n+import { SightingWithBook } from \"@/components/ledger-list\"\n+import { SightingsFeed } from \"@/components/sightings-feed\"\n+\n+export const dynamic = \"force-dynamic\"\n+\n+export default async function Home() {\n+  const { data: sightingsData, error } = await adminSupabase\n+    .from(\"sightings\")\n+    .select(\"*, book:books(*)\")\n+    .order(\"created_at\", { ascending: false })\n+    .limit(25)\n+\n+  if (error) {\n+    console.error(\"Error fetching sightings:\", error)\n+  }\n+\n+  // Cast the data to our type, assuming the join worked as expected.\n+  const rawSightings = (sightingsData || []) as unknown as SightingWithBook[]",
+    "path": "app/page.tsx",
+    "commit_id": "42114370876f310f6e498c27f38a4dbd7a5b0570",
+    "original_commit_id": "42114370876f310f6e498c27f38a4dbd7a5b0570",
+    "user": {
+      "login": "Copilot",
+      "id": 175728472,
+      "node_id": "BOT_kgDOCnlnWA",
+      "avatar_url": "https://avatars.githubusercontent.com/in/946600?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/Copilot",
+      "html_url": "https://github.com/apps/copilot-pull-request-reviewer",
+      "followers_url": "https://api.github.com/users/Copilot/followers",
+      "following_url": "https://api.github.com/users/Copilot/following{/other_user}",
+      "gists_url": "https://api.github.com/users/Copilot/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/Copilot/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/Copilot/subscriptions",
+      "organizations_url": "https://api.github.com/users/Copilot/orgs",
+      "repos_url": "https://api.github.com/users/Copilot/repos",
+      "events_url": "https://api.github.com/users/Copilot/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/Copilot/received_events",
+      "type": "Bot",
+      "user_view_type": "public",
+      "site_admin": false
+    },
+    "body": "Unsafe type casting: The cast `as unknown as SightingWithBook[]` bypasses TypeScript's type safety. The query uses `.select(\"*, book:books(*)\")` which should return data where each sighting has a `book` property, but this type assertion doesn't validate that the actual runtime data matches the expected structure. If the join fails or returns unexpected data, this could cause runtime errors in components expecting properly typed data.",
+    "created_at": "2025-12-19T06:00:39Z",
+    "updated_at": "2025-12-19T06:00:43Z",
+    "html_url": "https://github.com/clates/lfl-booktracker/pull/25#discussion_r2633772760",
+    "pull_request_url": "https://api.github.com/repos/clates/lfl-booktracker/pulls/25",
+    "_links": {
+      "self": {
+        "href": "https://api.github.com/repos/clates/lfl-booktracker/pulls/comments/2633772760"
+      },
+      "html": {
+        "href": "https://github.com/clates/lfl-booktracker/pull/25#discussion_r2633772760"
+      },
+      "pull_request": {
+        "href": "https://api.github.com/repos/clates/lfl-booktracker/pulls/25"
+      }
+    },
+    "reactions": {
+      "url": "https://api.github.com/repos/clates/lfl-booktracker/pulls/comments/2633772760/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "start_line": null,
+    "original_start_line": null,
+    "start_side": null,
+    "line": 21,
+    "original_line": 21,
+    "side": "RIGHT",
+    "author_association": "CONTRIBUTOR",
+    "original_position": 22,
+    "position": 22,
+    "subject_type": "line"
+  },
+  {
+    "url": "https://api.github.com/repos/clates/lfl-booktracker/pulls/comments/2633772769",
+    "pull_request_review_id": 3596999137,
+    "id": 2633772769,
+    "node_id": "PRRC_kwDONLllc86c_C7h",
+    "diff_hunk": "@@ -0,0 +1,152 @@\n+const { createClient } = require(\"@supabase/supabase-js\")\n+\n+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL\n+const supabaseKey = process.env.DB_KEY\n+\n+if (!supabaseUrl || !supabaseKey) {\n+  console.error(\"Missing Supabase credentials in environment.\")\n+  process.exit(1)\n+}\n+\n+const adminSupabase = createClient(supabaseUrl, supabaseKey, {\n+  auth: {\n+    persistSession: false,\n+    autoRefreshToken: false,\n+  },\n+})\n+\n+const LOCATIONS = [\n+  { name: \"Herndon\", lat: 38.9696, lon: -77.3861 },\n+  { name: \"Reston\", lat: 38.9586, lon: -77.357 },\n+  { name: \"Sterling\", lat: 39.0067, lon: -77.4291 },\n+  { name: \"Ashburn\", lat: 39.0438, lon: -77.4874 },\n+]\n+\n+const SEARCH_TERMS = [\n+  \"bestsellers 2024\",\n+  \"classic novels\",\n+  \"science fiction\",\n+  \"mystery thriller\",\n+  \"fantasy books\",\n+  \"biography\",\n+]\n+\n+function getRandomInt(min, max) {\n+  return Math.floor(Math.random() * (max - min + 1)) + min\n+}\n+\n+function getRandomLocation() {\n+  const loc = LOCATIONS[getRandomInt(0, LOCATIONS.length - 1)]\n+  const latJitter = (Math.random() - 0.5) * 0.04\n+  const lonJitter = (Math.random() - 0.5) * 0.04\n+  return {\n+    lat: loc.lat + latJitter,\n+    lon: loc.lon + lonJitter,\n+    name: loc.name,\n+  }\n+}\n+\n+async function fetchGoogleBooks() {\n+  console.log(\"Fetching books from Google Books API...\")\n+  let allBooks = []\n+\n+  for (const term of SEARCH_TERMS) {\n+    try {\n+      const res = await fetch(\n+        `https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(term)}&maxResults=10&printType=books&langRestrict=en`\n+      )\n+      if (!res.ok) continue\n+      const data = await res.json()\n+      if (data.items) {\n+        const books = data.items\n+          .map((item) => {\n+            const info = item.volumeInfo\n+            let cover = info.imageLinks?.thumbnail || info.imageLinks?.smallThumbnail\n+            if (cover) cover = cover.replace(\"http:\", \"https:\")\n+\n+            if (!info.title || !info.authors || !cover) return null\n+\n+            return {\n+              title: info.title,\n+              author: info.authors[0],\n+              cover: cover,\n+            }\n+          })\n+          .filter((b) => b !== null)\n+        allBooks = [...allBooks, ...books]\n+      }\n+    } catch (e) {\n+      console.error(`Failed to fetch for ${term}:`, e.message)\n+    }\n+  }\n+\n+  // Shuffle\n+  allBooks.sort(() => Math.random() - 0.5)\n+  // Unique by title to avoid duplicates\n+  const uniqueBooks = Array.from(new Map(allBooks.map((item) => [item.title, item])).values())\n+\n+  console.log(`Fetched ${uniqueBooks.length} unique realistic books.`)\n+  return uniqueBooks\n+}\n+\n+async function seed() {\n+  const freshBooks = await fetchGoogleBooks()\n+\n+  // Fallback if API fails\n+  if (freshBooks.length === 0) {\n+    console.error(\"No books fetched using API. Aborting realistic seed.\")\n+    return\n+  }\n+\n+  // Limit to 30 or available\n+  const booksToInsert = freshBooks.slice(0, 30)\n+  console.log(`Starting seed with ${booksToInsert.length} books...`)\n+\n+  let seededCount = 0\n+\n+  for (const bookMeta of booksToInsert) {\n+    const location = getRandomLocation()\n+    const code = Math.random().toString(36).substring(7).toUpperCase()\n+\n+    // 1. Create Book\n+    const { data: book, error: bookError } = await adminSupabase\n+      .from(\"books\")\n+      .insert({\n+        title: bookMeta.title,\n+        author: bookMeta.author,\n+        cover_url: bookMeta.cover,\n+        code: code,\n+        location: location.name,\n+        lat: location.lat,\n+        lon: location.lon,\n+      })\n+      .select()\n+      .single()\n+\n+    if (bookError) {\n+      console.error(\"Error creating book:\", bookError.message)\n+      continue\n+    }\n+\n+    // 2. Create Sighting\n+    const { error: sightingError } = await adminSupabase.from(\"sightings\").insert({\n+      book_id: book.id,\n+      location: location.name,\n+      lat: location.lat,\n+      lon: location.lon,\n+      sighting_type: \"DROP\",\n+      created_at: new Date(Date.now() - Math.random() * 24 * 60 * 60 * 1000).toISOString(),",
+    "path": "scripts/seed-standalone.js",
+    "commit_id": "42114370876f310f6e498c27f38a4dbd7a5b0570",
+    "original_commit_id": "42114370876f310f6e498c27f38a4dbd7a5b0570",
+    "user": {
+      "login": "Copilot",
+      "id": 175728472,
+      "node_id": "BOT_kgDOCnlnWA",
+      "avatar_url": "https://avatars.githubusercontent.com/in/946600?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/Copilot",
+      "html_url": "https://github.com/apps/copilot-pull-request-reviewer",
+      "followers_url": "https://api.github.com/users/Copilot/followers",
+      "following_url": "https://api.github.com/users/Copilot/following{/other_user}",
+      "gists_url": "https://api.github.com/users/Copilot/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/Copilot/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/Copilot/subscriptions",
+      "organizations_url": "https://api.github.com/users/Copilot/orgs",
+      "repos_url": "https://api.github.com/users/Copilot/repos",
+      "events_url": "https://api.github.com/users/Copilot/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/Copilot/received_events",
+      "type": "Bot",
+      "user_view_type": "public",
+      "site_admin": false
+    },
+    "body": "Random timestamp generation creates dates in the past 24 hours, but the comment on line 27 says \"should be oldest of the batch\" and line 29 says \"should be newest of the batch\". The script creates sightings with random timestamps within 24 hours, which means they won't necessarily be in any predictable order. This inconsistency between the comment expectation and the actual seeding behavior could lead to confusion when debugging.",
+    "created_at": "2025-12-19T06:00:39Z",
+    "updated_at": "2025-12-19T06:00:43Z",
+    "html_url": "https://github.com/clates/lfl-booktracker/pull/25#discussion_r2633772769",
+    "pull_request_url": "https://api.github.com/repos/clates/lfl-booktracker/pulls/25",
+    "_links": {
+      "self": {
+        "href": "https://api.github.com/repos/clates/lfl-booktracker/pulls/comments/2633772769"
+      },
+      "html": {
+        "href": "https://github.com/clates/lfl-booktracker/pull/25#discussion_r2633772769"
+      },
+      "pull_request": {
+        "href": "https://api.github.com/repos/clates/lfl-booktracker/pulls/25"
+      }
+    },
+    "reactions": {
+      "url": "https://api.github.com/repos/clates/lfl-booktracker/pulls/comments/2633772769/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "start_line": null,
+    "original_start_line": null,
+    "start_side": null,
+    "line": 138,
+    "original_line": 138,
+    "side": "RIGHT",
+    "author_association": "CONTRIBUTOR",
+    "original_position": 138,
+    "position": 138,
+    "subject_type": "line"
+  },
+  {
+    "url": "https://api.github.com/repos/clates/lfl-booktracker/pulls/comments/2633772784",
+    "pull_request_review_id": 3596999137,
+    "id": 2633772784,
+    "node_id": "PRRC_kwDONLllc86c_C7w",
+    "diff_hunk": "@@ -0,0 +1,43 @@\n+\"use client\"\n+\n+import { useState, useEffect } from \"react\"\n+import { SightingWithBook, LedgerList } from \"@/components/ledger-list\"\n+import { HomeMapWrapper } from \"@/components/home-map-wrapper\"\n+\n+interface SightingsFeedProps {\n+  initialSightings: SightingWithBook[]\n+}\n+\n+export function SightingsFeed({ initialSightings }: SightingsFeedProps) {\n+  const [displayedSightings, setDisplayedSightings] = useState<SightingWithBook[]>([])\n+  const [currentIndex, setCurrentIndex] = useState(0)\n+\n+  useEffect(() => {\n+    // If we've shown all sightings, stop.\n+    if (currentIndex >= initialSightings.length) return",
+    "path": "components/sightings-feed.tsx",
+    "commit_id": "42114370876f310f6e498c27f38a4dbd7a5b0570",
+    "original_commit_id": "42114370876f310f6e498c27f38a4dbd7a5b0570",
+    "user": {
+      "login": "Copilot",
+      "id": 175728472,
+      "node_id": "BOT_kgDOCnlnWA",
+      "avatar_url": "https://avatars.githubusercontent.com/in/946600?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/Copilot",
+      "html_url": "https://github.com/apps/copilot-pull-request-reviewer",
+      "followers_url": "https://api.github.com/users/Copilot/followers",
+      "following_url": "https://api.github.com/users/Copilot/following{/other_user}",
+      "gists_url": "https://api.github.com/users/Copilot/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/Copilot/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/Copilot/subscriptions",
+      "organizations_url": "https://api.github.com/users/Copilot/orgs",
+      "repos_url": "https://api.github.com/users/Copilot/repos",
+      "events_url": "https://api.github.com/users/Copilot/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/Copilot/received_events",
+      "type": "Bot",
+      "user_view_type": "public",
+      "site_admin": false
+    },
+    "body": "The condition `currentIndex >= initialSightings.length` will prevent the timer from clearing when the last item is processed. The useEffect dependencies include `currentIndex`, so when `currentIndex` becomes equal to `initialSightings.length`, the early return happens before the timer is set up, but any previously set timer continues running. This creates a memory leak. Consider adding a check after incrementing currentIndex to clear the timer, or restructure the logic to ensure cleanup happens properly.",
+    "created_at": "2025-12-19T06:00:39Z",
+    "updated_at": "2025-12-19T06:00:43Z",
+    "html_url": "https://github.com/clates/lfl-booktracker/pull/25#discussion_r2633772784",
+    "pull_request_url": "https://api.github.com/repos/clates/lfl-booktracker/pulls/25",
+    "_links": {
+      "self": {
+        "href": "https://api.github.com/repos/clates/lfl-booktracker/pulls/comments/2633772784"
+      },
+      "html": {
+        "href": "https://github.com/clates/lfl-booktracker/pull/25#discussion_r2633772784"
+      },
+      "pull_request": {
+        "href": "https://api.github.com/repos/clates/lfl-booktracker/pulls/25"
+      }
+    },
+    "reactions": {
+      "url": "https://api.github.com/repos/clates/lfl-booktracker/pulls/comments/2633772784/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "start_line": 15,
+    "original_start_line": 15,
+    "start_side": "RIGHT",
+    "line": 17,
+    "original_line": 17,
+    "side": "RIGHT",
+    "author_association": "CONTRIBUTOR",
+    "original_position": 17,
+    "position": 17,
+    "subject_type": "line"
+  },
+  {
+    "url": "https://api.github.com/repos/clates/lfl-booktracker/pulls/comments/2633772795",
+    "pull_request_review_id": 3596999137,
+    "id": 2633772795,
+    "node_id": "PRRC_kwDONLllc86c_C77",
+    "diff_hunk": "@@ -0,0 +1,152 @@\n+const { createClient } = require(\"@supabase/supabase-js\")\n+\n+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL\n+const supabaseKey = process.env.DB_KEY\n+\n+if (!supabaseUrl || !supabaseKey) {\n+  console.error(\"Missing Supabase credentials in environment.\")\n+  process.exit(1)\n+}\n+\n+const adminSupabase = createClient(supabaseUrl, supabaseKey, {\n+  auth: {\n+    persistSession: false,\n+    autoRefreshToken: false,\n+  },\n+})\n+\n+const LOCATIONS = [\n+  { name: \"Herndon\", lat: 38.9696, lon: -77.3861 },\n+  { name: \"Reston\", lat: 38.9586, lon: -77.357 },\n+  { name: \"Sterling\", lat: 39.0067, lon: -77.4291 },\n+  { name: \"Ashburn\", lat: 39.0438, lon: -77.4874 },\n+]\n+\n+const SEARCH_TERMS = [\n+  \"bestsellers 2024\",\n+  \"classic novels\",\n+  \"science fiction\",\n+  \"mystery thriller\",\n+  \"fantasy books\",\n+  \"biography\",\n+]\n+\n+function getRandomInt(min, max) {\n+  return Math.floor(Math.random() * (max - min + 1)) + min\n+}\n+\n+function getRandomLocation() {\n+  const loc = LOCATIONS[getRandomInt(0, LOCATIONS.length - 1)]\n+  const latJitter = (Math.random() - 0.5) * 0.04\n+  const lonJitter = (Math.random() - 0.5) * 0.04\n+  return {\n+    lat: loc.lat + latJitter,\n+    lon: loc.lon + lonJitter,\n+    name: loc.name,\n+  }\n+}\n+\n+async function fetchGoogleBooks() {\n+  console.log(\"Fetching books from Google Books API...\")\n+  let allBooks = []\n+\n+  for (const term of SEARCH_TERMS) {\n+    try {\n+      const res = await fetch(\n+        `https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(term)}&maxResults=10&printType=books&langRestrict=en`\n+      )\n+      if (!res.ok) continue\n+      const data = await res.json()\n+      if (data.items) {\n+        const books = data.items\n+          .map((item) => {\n+            const info = item.volumeInfo\n+            let cover = info.imageLinks?.thumbnail || info.imageLinks?.smallThumbnail\n+            if (cover) cover = cover.replace(\"http:\", \"https:\")\n+\n+            if (!info.title || !info.authors || !cover) return null\n+\n+            return {\n+              title: info.title,\n+              author: info.authors[0],\n+              cover: cover,\n+            }\n+          })\n+          .filter((b) => b !== null)\n+        allBooks = [...allBooks, ...books]\n+      }\n+    } catch (e) {\n+      console.error(`Failed to fetch for ${term}:`, e.message)\n+    }\n+  }\n+\n+  // Shuffle\n+  allBooks.sort(() => Math.random() - 0.5)",
+    "path": "scripts/seed-standalone.js",
+    "commit_id": "42114370876f310f6e498c27f38a4dbd7a5b0570",
+    "original_commit_id": "42114370876f310f6e498c27f38a4dbd7a5b0570",
+    "user": {
+      "login": "Copilot",
+      "id": 175728472,
+      "node_id": "BOT_kgDOCnlnWA",
+      "avatar_url": "https://avatars.githubusercontent.com/in/946600?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/Copilot",
+      "html_url": "https://github.com/apps/copilot-pull-request-reviewer",
+      "followers_url": "https://api.github.com/users/Copilot/followers",
+      "following_url": "https://api.github.com/users/Copilot/following{/other_user}",
+      "gists_url": "https://api.github.com/users/Copilot/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/Copilot/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/Copilot/subscriptions",
+      "organizations_url": "https://api.github.com/users/Copilot/orgs",
+      "repos_url": "https://api.github.com/users/Copilot/repos",
+      "events_url": "https://api.github.com/users/Copilot/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/Copilot/received_events",
+      "type": "Bot",
+      "user_view_type": "public",
+      "site_admin": false
+    },
+    "body": "Inefficient shuffling algorithm: Using `sort(() => Math.random() - 0.5)` is not a proper shuffle algorithm and has biased distribution. This is a known anti-pattern. Consider using the Fisher-Yates shuffle algorithm for proper randomization.",
+    "created_at": "2025-12-19T06:00:40Z",
+    "updated_at": "2025-12-19T06:00:43Z",
+    "html_url": "https://github.com/clates/lfl-booktracker/pull/25#discussion_r2633772795",
+    "pull_request_url": "https://api.github.com/repos/clates/lfl-booktracker/pulls/25",
+    "_links": {
+      "self": {
+        "href": "https://api.github.com/repos/clates/lfl-booktracker/pulls/comments/2633772795"
+      },
+      "html": {
+        "href": "https://github.com/clates/lfl-booktracker/pull/25#discussion_r2633772795"
+      },
+      "pull_request": {
+        "href": "https://api.github.com/repos/clates/lfl-booktracker/pulls/25"
+      }
+    },
+    "reactions": {
+      "url": "https://api.github.com/repos/clates/lfl-booktracker/pulls/comments/2633772795/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "start_line": null,
+    "original_start_line": null,
+    "start_side": null,
+    "line": 84,
+    "original_line": 84,
+    "side": "RIGHT",
+    "author_association": "CONTRIBUTOR",
+    "original_position": 84,
+    "position": 84,
+    "subject_type": "line"
+  },
+  {
+    "url": "https://api.github.com/repos/clates/lfl-booktracker/pulls/comments/2633772806",
+    "pull_request_review_id": 3596999137,
+    "id": 2633772806,
+    "node_id": "PRRC_kwDONLllc86c_C8G",
+    "diff_hunk": "@@ -1,8 +1,46 @@\n import { Hero } from \"@/components/hero\"\n import { HowItWorks } from \"@/components/how-it-works\"\n-import { HomeMapWrapper } from \"@/components/home-map-wrapper\"\n+import { adminSupabase } from \"@/lib/supabase-admin\"\n+import { SightingWithBook } from \"@/components/ledger-list\"\n+import { SightingsFeed } from \"@/components/sightings-feed\"\n+\n+export const dynamic = \"force-dynamic\"\n+\n+export default async function Home() {\n+  const { data: sightingsData, error } = await adminSupabase\n+    .from(\"sightings\")\n+    .select(\"*, book:books(*)\")\n+    .order(\"created_at\", { ascending: false })\n+    .limit(25)\n+\n+  if (error) {\n+    console.error(\"Error fetching sightings:\", error)\n+  }\n+\n+  // Cast the data to our type, assuming the join worked as expected.\n+  const rawSightings = (sightingsData || []) as unknown as SightingWithBook[]\n+\n+  // Manually fetch user info if user_id is present (since we can't easily join auth.users)\n+  const sightings = await Promise.all(\n+    rawSightings.map(async (sighting) => {\n+      if (sighting.user_id) {\n+        const { data: userData } = await adminSupabase.auth.admin.getUserById(sighting.user_id)\n+        if (userData.user) {\n+          return {\n+            ...sighting,\n+            user: {\n+              email: userData.user.email || \"\",\n+            },\n+          }",
+    "path": "app/page.tsx",
+    "commit_id": "42114370876f310f6e498c27f38a4dbd7a5b0570",
+    "original_commit_id": "42114370876f310f6e498c27f38a4dbd7a5b0570",
+    "user": {
+      "login": "Copilot",
+      "id": 175728472,
+      "node_id": "BOT_kgDOCnlnWA",
+      "avatar_url": "https://avatars.githubusercontent.com/in/946600?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/Copilot",
+      "html_url": "https://github.com/apps/copilot-pull-request-reviewer",
+      "followers_url": "https://api.github.com/users/Copilot/followers",
+      "following_url": "https://api.github.com/users/Copilot/following{/other_user}",
+      "gists_url": "https://api.github.com/users/Copilot/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/Copilot/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/Copilot/subscriptions",
+      "organizations_url": "https://api.github.com/users/Copilot/orgs",
+      "repos_url": "https://api.github.com/users/Copilot/repos",
+      "events_url": "https://api.github.com/users/Copilot/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/Copilot/received_events",
+      "type": "Bot",
+      "user_view_type": "public",
+      "site_admin": false
+    },
+    "body": "Exposing user email in client-side code: User email addresses are being fetched server-side and passed to client components without any sanitization or permission checks. The email is then displayed publicly (split at @ and showing the username part). Consider whether this information should be publicly visible and if users have consented to this level of information sharing. Additionally, verify that appropriate privacy controls are in place.",
+    "created_at": "2025-12-19T06:00:40Z",
+    "updated_at": "2025-12-19T06:00:43Z",
+    "html_url": "https://github.com/clates/lfl-booktracker/pull/25#discussion_r2633772806",
+    "pull_request_url": "https://api.github.com/repos/clates/lfl-booktracker/pulls/25",
+    "_links": {
+      "self": {
+        "href": "https://api.github.com/repos/clates/lfl-booktracker/pulls/comments/2633772806"
+      },
+      "html": {
+        "href": "https://github.com/clates/lfl-booktracker/pull/25#discussion_r2633772806"
+      },
+      "pull_request": {
+        "href": "https://api.github.com/repos/clates/lfl-booktracker/pulls/25"
+      }
+    },
+    "reactions": {
+      "url": "https://api.github.com/repos/clates/lfl-booktracker/pulls/comments/2633772806/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "start_line": 24,
+    "original_start_line": 24,
+    "start_side": "RIGHT",
+    "line": 34,
+    "original_line": 34,
+    "side": "RIGHT",
+    "author_association": "CONTRIBUTOR",
+    "original_position": 35,
+    "position": 35,
+    "subject_type": "line"
+  },
+  {
+    "url": "https://api.github.com/repos/clates/lfl-booktracker/pulls/comments/2633772822",
+    "pull_request_review_id": 3596999137,
+    "id": 2633772822,
+    "node_id": "PRRC_kwDONLllc86c_C8W",
+    "diff_hunk": "@@ -0,0 +1,89 @@\n+\"use client\"\n+\n+import { ScrollArea } from \"@/components/ui/scroll-area\"\n+import { Sighting } from \"@/lib/types\" // Assuming we can use or extend this\n+import Image from \"next/image\"\n+\n+// We need an extended type because the basic Sighting type might not have the joined book data.\n+// Based on the query: .select('*, books(*)') -> returns 'books' property or .select('*, book:books(*)') returns 'book'\n+// The user request example had .select('*, books(*)')\n+// I'll assume we map it to a comfortable structure or use the raw result.\n+// Let's define the prop type clearly.\n+\n+export type SightingWithBook = Sighting & {\n+  book: {\n+    title: string\n+    author: string\n+    cover_url?: string\n+  } | null\n+}\n+// Note: Supabase join via books(*) usually returns an object if it's many-to-one, or array if one-to-many.\n+// sightings.book_id -> books.id. This is Many-to-One (Sighting belongs to Book).\n+// So 'books' should be a single object (or null).\n+\n+interface LedgerListProps {\n+  sightings: SightingWithBook[]\n+}\n+\n+export function LedgerList({ sightings }: LedgerListProps) {\n+  // Logic lifted to parent SightingsFeed.\n+  // Rendering the passed prop directly.\n+\n+  return (\n+    <div className=\"w-full h-[500px] flex flex-col bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 rounded-xl border shadow-xl overflow-hidden\">\n+      <div className=\"p-4 border-b bg-muted/50\">\n+        <h2 className=\"font-serif text-xl font-bold\">Recent Sightings</h2>\n+        <p className=\"text-xs text-muted-foreground\">Live activity from the community</p>\n+      </div>\n+      <ScrollArea className=\"flex-1 p-4\">\n+        <div className=\"space-y-4 pr-4\">\n+          {sightings.map((sighting) => {\n+            // Handle case where book might is missing or joined differently, but typing helps.",
+    "path": "components/ledger-list.tsx",
+    "commit_id": "42114370876f310f6e498c27f38a4dbd7a5b0570",
+    "original_commit_id": "42114370876f310f6e498c27f38a4dbd7a5b0570",
+    "user": {
+      "login": "Copilot",
+      "id": 175728472,
+      "node_id": "BOT_kgDOCnlnWA",
+      "avatar_url": "https://avatars.githubusercontent.com/in/946600?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/Copilot",
+      "html_url": "https://github.com/apps/copilot-pull-request-reviewer",
+      "followers_url": "https://api.github.com/users/Copilot/followers",
+      "following_url": "https://api.github.com/users/Copilot/following{/other_user}",
+      "gists_url": "https://api.github.com/users/Copilot/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/Copilot/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/Copilot/subscriptions",
+      "organizations_url": "https://api.github.com/users/Copilot/orgs",
+      "repos_url": "https://api.github.com/users/Copilot/repos",
+      "events_url": "https://api.github.com/users/Copilot/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/Copilot/received_events",
+      "type": "Bot",
+      "user_view_type": "public",
+      "site_admin": false
+    },
+    "body": "The comment is outdated or misleading. Line 41 says \"Handle case where book might is missing\" but \"might is\" is grammatically incorrect. It should be either \"might be missing\" or \"is missing\". This appears to be a typo in the comment.\n```suggestion\n            // Handle case where book might be missing or joined differently, but typing helps.\n```",
+    "created_at": "2025-12-19T06:00:40Z",
+    "updated_at": "2025-12-19T06:00:43Z",
+    "html_url": "https://github.com/clates/lfl-booktracker/pull/25#discussion_r2633772822",
+    "pull_request_url": "https://api.github.com/repos/clates/lfl-booktracker/pulls/25",
+    "_links": {
+      "self": {
+        "href": "https://api.github.com/repos/clates/lfl-booktracker/pulls/comments/2633772822"
+      },
+      "html": {
+        "href": "https://github.com/clates/lfl-booktracker/pull/25#discussion_r2633772822"
+      },
+      "pull_request": {
+        "href": "https://api.github.com/repos/clates/lfl-booktracker/pulls/25"
+      }
+    },
+    "reactions": {
+      "url": "https://api.github.com/repos/clates/lfl-booktracker/pulls/comments/2633772822/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "start_line": null,
+    "original_start_line": null,
+    "start_side": null,
+    "line": 41,
+    "original_line": 41,
+    "side": "RIGHT",
+    "author_association": "CONTRIBUTOR",
+    "original_position": 41,
+    "position": 41,
+    "subject_type": "line"
+  },
+  {
+    "url": "https://api.github.com/repos/clates/lfl-booktracker/pulls/comments/2633772839",
+    "pull_request_review_id": 3596999137,
+    "id": 2633772839,
+    "node_id": "PRRC_kwDONLllc86c_C8n",
+    "diff_hunk": "@@ -68,7 +68,22 @@ export default function HomeMap() {\n           attribution='&copy; <a href=\"https://www.openstreetmap.org/copyright\">OpenStreetMap</a> contributors'\n           url=\"https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png\"\n         />\n-        <LocationMarker />\n+        <MapUpdater center={flyToCenter} />\n+        {sightings.map((sighting) => {\n+          if (sighting.lat && sighting.lon) {\n+            return (\n+              <Marker key={sighting.id} position={[sighting.lat, sighting.lon]} icon={sightingIcon}>\n+                <Popup>\n+                  <div className=\"flex flex-col gap-1\">\n+                    <span className=\"font-bold text-sm\">{sighting.book?.title}</span>\n+                    <span className=\"text-xs\">{sighting.book?.author}</span>\n+                  </div>\n+                </Popup>",
+    "path": "components/home-map.tsx",
+    "commit_id": "42114370876f310f6e498c27f38a4dbd7a5b0570",
+    "original_commit_id": "42114370876f310f6e498c27f38a4dbd7a5b0570",
+    "user": {
+      "login": "Copilot",
+      "id": 175728472,
+      "node_id": "BOT_kgDOCnlnWA",
+      "avatar_url": "https://avatars.githubusercontent.com/in/946600?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/Copilot",
+      "html_url": "https://github.com/apps/copilot-pull-request-reviewer",
+      "followers_url": "https://api.github.com/users/Copilot/followers",
+      "following_url": "https://api.github.com/users/Copilot/following{/other_user}",
+      "gists_url": "https://api.github.com/users/Copilot/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/Copilot/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/Copilot/subscriptions",
+      "organizations_url": "https://api.github.com/users/Copilot/orgs",
+      "repos_url": "https://api.github.com/users/Copilot/repos",
+      "events_url": "https://api.github.com/users/Copilot/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/Copilot/received_events",
+      "type": "Bot",
+      "user_view_type": "public",
+      "site_admin": false
+    },
+    "body": "Missing alt text for popup content: The popup displays book information but doesn't provide any accessible context for screen readers. Consider adding aria-labels or more semantic HTML structure to make the popup content accessible to users relying on assistive technology.",
+    "created_at": "2025-12-19T06:00:40Z",
+    "updated_at": "2025-12-19T06:00:43Z",
+    "html_url": "https://github.com/clates/lfl-booktracker/pull/25#discussion_r2633772839",
+    "pull_request_url": "https://api.github.com/repos/clates/lfl-booktracker/pulls/25",
+    "_links": {
+      "self": {
+        "href": "https://api.github.com/repos/clates/lfl-booktracker/pulls/comments/2633772839"
+      },
+      "html": {
+        "href": "https://github.com/clates/lfl-booktracker/pull/25#discussion_r2633772839"
+      },
+      "pull_request": {
+        "href": "https://api.github.com/repos/clates/lfl-booktracker/pulls/25"
+      }
+    },
+    "reactions": {
+      "url": "https://api.github.com/repos/clates/lfl-booktracker/pulls/comments/2633772839/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "start_line": 76,
+    "original_start_line": 76,
+    "start_side": "RIGHT",
+    "line": 81,
+    "original_line": 81,
+    "side": "RIGHT",
+    "author_association": "CONTRIBUTOR",
+    "original_position": 96,
+    "position": 96,
+    "subject_type": "line"
+  }
+]
