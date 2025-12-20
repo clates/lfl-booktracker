@@ -7,7 +7,7 @@ process.env.DB_KEY = "mock-key"
 if (typeof global.Request === "undefined") {
   global.Request = class Request {
     constructor(input, init) {
-      return { input, init, json: () => Promise.resolve({}) }
+      return { url: input, input, init, json: () => Promise.resolve({}) }
     }
   }
 }
@@ -15,7 +15,16 @@ if (typeof global.Request === "undefined") {
 if (typeof global.Response === "undefined") {
   global.Response = class Response {
     constructor(body, init) {
-      return { body, init, ok: true, json: () => Promise.resolve(body) }
+      return {
+        body,
+        init,
+        ok: true,
+        status: init?.status || 200,
+        headers: {
+          get: (key) => init?.headers?.[key] || null,
+        },
+        json: () => Promise.resolve(body),
+      }
     }
   }
 }
