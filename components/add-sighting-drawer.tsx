@@ -30,7 +30,32 @@ export function AddSightingDrawer() {
   const [generatedCode, setGeneratedCode] = useState<string>("")
   const [isGenerating, setIsGenerating] = useState(false)
   const { toast } = useToast()
-  const { latitude, longitude } = useLocation()
+  const { latitude, longitude, error: locationError } = useLocation()
+  const [locationTimeout, setLocationTimeout] = useState(false)
+
+  // Handle location timeout and errors
+  useEffect(() => {
+    // If we have location or explicit error, no need to wait
+    if (latitude || locationError) {
+      setLocationTimeout(false)
+      return
+    }
+
+    // Only start timeout if drawer is open and we don't have location yet
+    if (open && !latitude && !locationError) {
+      const timer = setTimeout(() => {
+        setLocationTimeout(true)
+        toast({
+          title: "Location Access Required",
+          description:
+            "We couldn't get your location. Please check your browser settings and try again.",
+          variant: "destructive",
+        })
+      }, 5000)
+
+      return () => clearTimeout(timer)
+    }
+  }, [open, latitude, locationError, toast])
 
   function getCookie(name: string) {
     if (typeof document === "undefined") return null
@@ -53,11 +78,20 @@ export function AddSightingDrawer() {
     if (!selectedBook) return
 
     if (!latitude || !longitude) {
-      toast({
-        title: "Location Required",
-        description: "We need your location to generate a code.",
-        variant: "destructive",
-      })
+      // If we timed out or have an error, explain why again
+      if (locationTimeout || locationError) {
+        toast({
+          title: "Location Access Required",
+          description: "Please enable location services to generate a code.",
+          variant: "destructive",
+        })
+      } else {
+        toast({
+          title: "Location Required",
+          description: "We need your location to generate a code.",
+          variant: "destructive",
+        })
+      }
       return
     }
 
@@ -115,8 +149,10 @@ export function AddSightingDrawer() {
       <DrawerTrigger asChild>
         <div className="text-center cursor-pointer group">
           <p className="text-muted-foreground text-sm flex items-center justify-center gap-1 group-hover:text-primary transition-colors">
-            Can&apos;t find your book?
-            <span className="font-semibold underline underline-offset-2">Register it here</span>
+            Donating a book?
+            <span className="font-semibold underline underline-offset-2">
+              Track its travels here
+            </span>
           </p>
         </div>
       </DrawerTrigger>
@@ -176,7 +212,7 @@ export function AddSightingDrawer() {
 
                       <Button
                         onClick={handleGenerate}
-                        disabled={isGenerating || !latitude}
+                        disabled={isGenerating || (!latitude && !locationError && !locationTimeout)}
                         className="w-full font-serif text-lg shadow-md"
                         size="lg"
                       >
@@ -186,10 +222,14 @@ export function AddSightingDrawer() {
                             Forging Code...
                           </>
                         ) : !latitude ? (
-                          <>
-                            <MapPin className="mr-2 h-5 w-5 animate-pulse" />
-                            Locating you...
-                          </>
+                          locationError || locationTimeout ? (
+                            "Location Access Required"
+                          ) : (
+                            <>
+                              <MapPin className="mr-2 h-5 w-5 animate-pulse" />
+                              Locating you...
+                            </>
+                          )
                         ) : (
                           "Generate Tracking Code"
                         )}
