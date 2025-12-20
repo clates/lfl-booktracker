@@ -49,7 +49,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
 
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`font-sans`}>
+      <body className={`${inter.variable} ${crimson.variable} font-sans`}>
         <ParchmentFilters />
         <ThemeProvider
           attribute="class"

@@ -3,25 +3,28 @@
 import { useState, useEffect } from "react"
 import { ParchmentFrame } from "@/components/ui/parchment-frame"
 import { GoogleBookSearch } from "@/components/google-book-search"
-import { Button } from "@/components/ui/button"
 import { useToast } from "@/hooks/use-toast"
 import useLocation from "@/hooks/use-location"
-import { GoogleBookData } from "@/lib/types"
 import { Loader2 } from "lucide-react"
 
 export default function GeneratePage() {
-  const [selectedBook, setSelectedBook] = useState<GoogleBookData | null>(null)
+  const [selectedBook, setSelectedBook] = useState<{
+    title: string
+    authors?: string[]
+    coverUrl?: string
+  } | null>(null)
 
   const [generatedCode, setGeneratedCode] = useState<string>("")
   const [isGenerating, setIsGenerating] = useState(false)
   const { toast } = useToast()
   const { latitude, longitude } = useLocation()
 
-  // Helper to get cookie
   function getCookie(name: string) {
+    if (typeof document === "undefined") return null
     const value = `; ${document.cookie}`
     const parts = value.split(`; ${name}=`)
     if (parts.length === 2) return parts.pop()?.split(";").shift()
+    return null
   }
 
   useEffect(() => {
@@ -35,7 +38,6 @@ export default function GeneratePage() {
   async function handleGenerate() {
     if (!selectedBook) return
 
-    // Basic location check - navigator.geolocation is also checked by useLocation hook
     if (!latitude || !longitude) {
       toast({
         title: "Location Required",
@@ -47,7 +49,8 @@ export default function GeneratePage() {
 
     setIsGenerating(true)
     try {
-      const anonymousId = getCookie("lfl_anonymous_id")
+      // Get anonymous ID if exists
+      const anonymousId = getCookie("anonymousId")
       const response = await fetch("/api/books/generate", {
         method: "POST",
         headers: {
@@ -128,83 +131,68 @@ export default function GeneratePage() {
                 </div>
 
                 {selectedBook && (
-                  <div className="bg-background/50 p-6 rounded-lg border border-primary/10 flex flex-col md:flex-row gap-6 items-center md:items-start animate-in fade-in zoom-in-95 duration-300">
-                    {selectedBook.coverUrl ? (
-                      <div className="relative w-32 h-48 shadow-md rounded-sm overflow-hidden flex-shrink-0">
+                  <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                    <div className="flex gap-6 p-4 bg-muted/30 rounded-lg border border-primary/10">
+                      {selectedBook.coverUrl && (
                         <img
                           src={selectedBook.coverUrl}
                           alt={selectedBook.title}
-                          className="w-full h-full object-cover"
+                          className="w-24 h-36 object-cover rounded shadow-md"
                         />
+                      )}
+                      <div className="space-y-2">
+                        <h3 className="font-serif text-xl font-semibold">{selectedBook.title}</h3>
+                        <p className="text-muted-foreground">{selectedBook.authors?.join(", ")}</p>
                       </div>
-                    ) : (
-                      <div className="w-32 h-48 bg-muted flex items-center justify-center rounded-sm shadow-sm flex-shrink-0">
-                        <span className="text-xs text-muted-foreground text-center px-2">
-                          No Cover
-                        </span>
-                      </div>
-                    )}
+                    </div>
 
-                    <div className="flex-1 space-y-4 text-center md:text-left w-full">
-                      <div>
-                        <h3 className="font-serif text-xl font-bold text-primary">
-                          {selectedBook.title}
-                        </h3>
-                        <p className="text-muted-foreground italic">
-                          {selectedBook.authors?.join(", ") || "Unknown Author"}
-                        </p>
-                      </div>
-
-                      <div className="pt-2">
-                        <Button
-                          onClick={handleGenerate}
-                          disabled={isGenerating || !latitude}
-                          className="w-full md:w-auto font-serif"
-                          size="lg"
-                        >
-                          {isGenerating ? (
-                            <>
-                              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                              Generating Identity...
-                            </>
-                          ) : (
-                            "Generate Tracking Code"
-                          )}
-                        </Button>
-                        {!latitude && (
-                          <p className="text-xs text-destructive mt-2">
-                            Location access is required to generate a code.
-                          </p>
+                    <div className="flex justify-center">
+                      <button
+                        onClick={handleGenerate}
+                        disabled={isGenerating || !latitude}
+                        className="px-8 py-3 bg-primary text-primary-foreground font-serif text-lg rounded-full shadow-lg hover:shadow-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                      >
+                        {isGenerating ? (
+                          <>
+                            <Loader2 className="h-5 w-5 animate-spin" />
+                            Forging Code...
+                          </>
+                        ) : !latitude ? (
+                          "Waiting for Location..."
+                        ) : (
+                          "Generate Tracking Code"
                         )}
-                      </div>
+                      </button>
                     </div>
                   </div>
                 )}
               </div>
             ) : (
-              <div className="flex flex-col items-center justify-center space-y-8 py-8 animate-in slide-in-from-bottom-4 duration-500">
-                <div className="text-center space-y-2">
-                  <h2 className="font-serif text-3xl font-bold text-primary">Identity Assigned</h2>
-                  <p className="text-muted-foreground italic">
-                    Please write this code clearly on the inside cover.
+              <div className="space-y-8 text-center animate-in zoom-in-95 duration-500">
+                <div className="space-y-4">
+                  <h2 className="font-serif text-2xl font-bold text-primary">
+                    Your Book is Ready!
+                  </h2>
+                  <p className="text-muted-foreground">
+                    Write this code clearly on the inside cover of your book:
                   </p>
                 </div>
 
-                <div className="relative p-8 border-4 border-double border-primary/20 bg-background/50 rounded-lg shadow-inner">
-                  <p className="font-mono text-5xl md:text-6xl font-bold tracking-widest text-primary select-all">
+                <div className="py-8 px-6 bg-muted/50 rounded-xl border-2 border-dashed border-primary/20">
+                  <p className="font-mono text-4xl sm:text-5xl font-bold tracking-widest text-primary select-all">
                     {formatCode(generatedCode)}
                   </p>
                 </div>
 
-                <Button
-                  variant="outline"
+                <button
                   onClick={() => {
                     setGeneratedCode("")
                     setSelectedBook(null)
                   }}
+                  className="text-muted-foreground hover:text-primary underline underline-offset-4 transition-colors"
                 >
-                  Generate Another
-                </Button>
+                  Register another book
+                </button>
               </div>
             )}
           </ParchmentFrame>

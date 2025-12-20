@@ -49,9 +49,8 @@ export async function POST(request: Request) {
     const { title, author, cover_url: cover_link, isbn } = parseBookMetadata(bookData)
 
     if (!title || title === "Unknown Title") {
-      console.warn("Attempted to generate book with no title", bookData)
-      // We can iterate on this: define if text "Unknown Title" is acceptable.
-      // For now, allow it but log it. If stringent validation is needed, throw error.
+      console.error("Attempted to generate book with no title", bookData)
+      return NextResponse.json({ error: "Book title is required" }, { status: 400 })
     }
 
     // 5. Persist Book
