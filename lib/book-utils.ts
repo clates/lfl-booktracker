@@ -41,7 +41,7 @@ export function parseBookMetadata(bookData: BookMetadata) {
   if ("coverUrl" in bookData && bookData.coverUrl) {
     cover_url = bookData.coverUrl
   } else if ("cover_url" in bookData && bookData.cover_url) {
-    cover_url = bookData.cover_url
+    cover_url = (bookData as any).cover_url
   }
 
   // OpenLibrary Logic (using getBookCover helper which expects OpenLibraryDoc)

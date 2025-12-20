@@ -1,3 +1,5 @@
+"use client"
+
 import { useState, useEffect } from "react"
 import { ParchmentFrame } from "@/components/ui/parchment-frame"
 import { GoogleBookSearch } from "@/components/google-book-search"
