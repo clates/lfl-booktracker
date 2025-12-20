@@ -1,70 +1,78 @@
-import { parseBookMetadata } from "@/lib/book-utils"
-import { BookMetadata } from "@/lib/types"
+import { POST } from "@/app/api/books/generate/route"
+import { NextResponse } from "next/server"
 
-describe("parseBookMetadata", () => {
-  it("should parse Google Books data correctly", () => {
-    const googleBook: BookMetadata = {
-      title: "Google Book Title",
-      authors: ["Author One", "Author Two"],
-      coverUrl: "http://example.com/cover.jpg",
-      isbn: "1234567890",
-      googleId: "g1",
-    }
+// Mock NextResponse
+jest.mock("next/server", () => ({
+  NextResponse: {
+    json: jest.fn().mockImplementation((body, options) => ({
+      status: options?.status || 200,
+      json: async () => body,
+      ...body,
+    })),
+  },
+}))
 
-    const result = parseBookMetadata(googleBook)
-
-    expect(result).toEqual({
-      title: "Google Book Title",
-      author: "Author One, Author Two",
-      cover_url: "http://example.com/cover.jpg",
-      isbn: "1234567890",
+// Mock next/headers
+jest.mock("next/headers", () => ({
+  cookies: jest.fn().mockReturnValue(
+    Promise.resolve({
+      getAll: jest.fn().mockReturnValue([]),
+      get: jest.fn().mockReturnValue(undefined),
     })
-  })
+  ),
+}))
 
-  it("should parse OpenLibrary data correctly", () => {
-    const olBook: BookMetadata = {
-      title: "OL Book Title",
-      author_name: ["OL Author"],
-      cover_edition_key: "OL123M",
-      isbn: ["0987654321"],
-      key: "/works/OL123W",
-      // Force type to satisfy simplified mock if needed, but the structure matches
-      edition_key: ["OL123M"],
-      publish_year: [2021],
-    } as any // Cast as any because OpenLibraryDoc has many required fields
+jest.mock("@supabase/auth-helpers-nextjs", () => ({
+  createRouteHandlerClient: jest.fn().mockReturnValue({
+    auth: {
+      getSession: jest.fn().mockResolvedValue({ data: { session: null } }),
+    },
+  }),
+}))
 
-    const result = parseBookMetadata(olBook)
+jest.mock("@supabase/supabase-js", () => ({
+  createClient: jest.fn().mockReturnValue({
+    from: jest.fn().mockReturnValue({
+      insert: jest.fn().mockReturnValue({
+        select: jest.fn().mockReturnValue({
+          single: jest.fn().mockResolvedValue({ data: { id: "test-id" }, error: null }),
+        }),
+      }),
+    }),
+  }),
+}))
 
-    expect(result).toEqual({
-      title: "OL Book Title",
-      author: "OL Author",
-      cover_url: "https://covers.openlibrary.org/b/olid/OL123M-M.jpg", // Expecting getBookCover logic
-      isbn: "0987654321",
+jest.mock("@/lib/id_generator", () => ({
+  generateBookId: jest.fn().mockResolvedValue("TEST-CODE"),
+}))
+
+jest.mock("@/lib/book-utils", () => ({
+  parseBookMetadata: jest.fn().mockReturnValue({
+    title: "Test Title",
+    author: "Test Author",
+    cover_url: "http://test.com/cover.jpg",
+    isbn: "1234567890",
+  }),
+}))
+
+describe("POST /api/books/generate", () => {
+  it("should generate a book code successfully", async () => {
+    const request = new Request("http://localhost:3000/api/books/generate", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
     })
-  })
 
-  it("should handle missing optional fields gracefully", () => {
-    const minimalBook: BookMetadata = {
-      title: "Minimal Book",
-    } as any
-
-    const result = parseBookMetadata(minimalBook)
-
-    expect(result).toEqual({
-      title: "Minimal Book",
-      author: "Unknown Author",
-      cover_url: null,
-      isbn: null,
+    jest.spyOn(request, "json").mockResolvedValue({
+      location: { lat: 40.7128, long: -74.006 },
+      book: { title: "Test Book" },
+      anonymousId: "anon-123",
     })
-  })
 
-  it("should return defaults for null input", () => {
-    const result = parseBookMetadata(null as any)
-    expect(result).toEqual({
-      title: "Unknown Title",
-      author: "Unknown Author",
-      cover_url: null,
-      isbn: null,
-    })
+    const response = await POST(request)
+    const data = await response.json()
+
+    expect(data.code).toBe("TEST-CODE")
   })
 })

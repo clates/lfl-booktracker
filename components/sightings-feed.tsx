@@ -28,9 +28,14 @@ export function SightingsFeed({ initialSightings }: SightingsFeedProps) {
 
         const nextItem = initialSightings[prevIndex]
 
-        // Safety check if nextItem is undefined (though length check above should prevent this)
         if (nextItem) {
-          setDisplayedSightings((prevSightings) => [nextItem, ...prevSightings])
+          setDisplayedSightings((prevSightings) => {
+            // Prevent duplicates
+            if (prevSightings.some((s) => s.id === nextItem.id)) {
+              return prevSightings
+            }
+            return [nextItem, ...prevSightings]
+          })
         }
 
         return prevIndex + 1
@@ -38,10 +43,10 @@ export function SightingsFeed({ initialSightings }: SightingsFeedProps) {
     }, SIGHTING_DISPLAY_INTERVAL_MS)
 
     return () => clearInterval(timer)
-  }, [currentIndex, initialSightings])
+  }, [initialSightings])
 
   return (
-    <div className="container flex flex-col lg:flex-row mx-auto px-4 gap-8 lg:gap-16 py-8">
+    <div className="container flex flex-col-reverse lg:flex-row mx-auto px-4 gap-8 lg:gap-16 py-8">
       <div className="w-full lg:w-2/3">
         {/* Map takes up more space on desktop */}
         <HomeMapWrapper sightings={displayedSightings} />

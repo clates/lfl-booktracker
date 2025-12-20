@@ -1,4 +1,5 @@
 import { BookSearch } from "@/components/book-search"
+import { AddSightingDrawer } from "@/components/add-sighting-drawer"
 
 export function Hero() {
   return (
@@ -15,6 +16,7 @@ export function Hero() {
           </div>
           <div className="w-full max-w-sm md:max-w-2xl space-y-2">
             <BookSearch hideTitle className="border-0 shadow-lg" />
+            <AddSightingDrawer />
           </div>
         </div>
       </div>

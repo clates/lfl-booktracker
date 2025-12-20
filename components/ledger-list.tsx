@@ -77,7 +77,7 @@ export function LedgerList({ sightings }: LedgerListProps) {
           })}
           {sightings.length === 0 && (
             <div className="text-center text-muted-foreground py-8 animate-pulse">
-              Listening for drops...
+              Waiting for sightings...
             </div>
           )}
         </div>

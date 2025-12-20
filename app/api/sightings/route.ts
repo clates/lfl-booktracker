@@ -38,14 +38,11 @@ export async function POST(request: Request) {
     const { bookId, location } = await request.json()
 
     // Auth Check: Use Anon Key with Session
-    const cookieStore = cookies()
-    const supabase = createRouteHandlerClient(
-      { cookies: () => cookieStore },
-      {
-        supabaseUrl: process.env.NEXT_PUBLIC_SUPABASE_URL,
-        supabaseKey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
-      }
-    )
+    const cookieStore = await cookies()
+    const supabase = createRouteHandlerClient({ cookies: () => cookieStore } as any, {
+      supabaseUrl: process.env.NEXT_PUBLIC_SUPABASE_URL,
+      supabaseKey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+    })
 
     const {
       data: { user },
