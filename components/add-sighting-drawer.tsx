@@ -135,10 +135,6 @@ export function AddSightingDrawer() {
     }
   }
 
-  function formatCode(code: string) {
-    return `${code.slice(0, 4)}-${code.slice(4, 6)}-${code.slice(6, 9)}`.toUpperCase()
-  }
-
   function resetState() {
     setGeneratedCode("")
     setSelectedBook(null)
@@ -250,7 +246,7 @@ export function AddSightingDrawer() {
 
                   <div className="py-6 px-4 bg-white/50 rounded-lg border-2 border-dashed border-primary/20 backdrop-blur-sm">
                     <p className="font-mono text-3xl font-bold tracking-widest text-primary select-all">
-                      {formatCode(generatedCode)}
+                      {generatedCode}
                     </p>
                   </div>
 

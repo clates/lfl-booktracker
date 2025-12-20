@@ -11,11 +11,15 @@ function MapUpdater({ center }: { center: [number, number] | null }) {
   const map = useMapEvents({})
 
   useEffect(() => {
-    if (center) {
-      map.flyTo(center, 13, {
-        animate: true,
-        duration: 1.5,
-      })
+    if (center && Array.isArray(center) && center.length === 2) {
+      const lat = Number(center[0])
+      const lng = Number(center[1])
+      if (Number.isFinite(lat) && Number.isFinite(lng)) {
+        map.flyTo([lat, lng], 13, {
+          animate: true,
+          duration: 1.5,
+        })
+      }
     }
   }, [center, map])
 

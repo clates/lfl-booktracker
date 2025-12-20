@@ -21,8 +21,8 @@ export async function POST(request: Request) {
 
     // 1. Check user session (optional but good context)
     // Use defaults (implicitly uses NEXT_PUBLIC_SUPABASE_ANON_KEY)
-    const cookieStore = cookies()
-    const supabase = createRouteHandlerClient({ cookies: () => cookieStore })
+    const cookieStore = await cookies()
+    const supabase = createRouteHandlerClient({ cookies: () => cookieStore } as any)
     const {
       data: { session },
     } = await supabase.auth.getSession()
