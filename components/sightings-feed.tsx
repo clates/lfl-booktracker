@@ -19,19 +19,22 @@ export function SightingsFeed({ initialSightings }: SightingsFeedProps) {
     if (currentIndex >= initialSightings.length) return
 
     const timer = setInterval(() => {
-      const nextItem = initialSightings[currentIndex]
+      setCurrentIndex((prevIndex) => {
+        // Stop if we reached the end
+        if (prevIndex >= initialSightings.length) {
+          clearInterval(timer)
+          return prevIndex
+        }
 
-      if (nextItem) {
-        setDisplayedSightings((prevSightings) => {
-          // Prevent duplicates
-          if (prevSightings.some((s) => s.id === nextItem.id)) {
-            return prevSightings
-          }
-          return [nextItem, ...prevSightings]
-        })
-      }
+        const nextItem = initialSightings[prevIndex]
 
-      setCurrentIndex((prev) => prev + 1)
+        // Safety check if nextItem is undefined (though length check above should prevent this)
+        if (nextItem) {
+          setDisplayedSightings((prevSightings) => [nextItem, ...prevSightings])
+        }
+
+        return prevIndex + 1
+      })
     }, SIGHTING_DISPLAY_INTERVAL_MS)
 
     return () => clearInterval(timer)

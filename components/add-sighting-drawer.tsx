@@ -147,8 +147,8 @@ export function AddSightingDrawer() {
   return (
     <Drawer open={open} onOpenChange={setOpen}>
       <DrawerTrigger asChild>
-        <div className="text-center cursor-pointer group">
-          <p className="text-muted-foreground text-sm flex items-center justify-center gap-1 group-hover:text-primary transition-colors">
+        <div className="text-center cursor-pointer group py-4">
+          <p className="text-muted-foreground text-lg flex flex-col sm:flex-row items-center justify-center gap-1 group-hover:text-primary transition-colors">
             Donating a book?
             <span className="font-semibold underline underline-offset-2">
               Track its travels here

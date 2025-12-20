@@ -73,7 +73,7 @@ export function BookSearch({ className, hideTitle = false }: BookSearchProps) {
                       <Input
                         placeholder="Enter book code"
                         {...field}
-                        className="lowercase bg-white/50 border-[#d6cba0] focus-visible:ring-[#8b4513]"
+                        className="lowercase bg-white/90 border-[#8b4513]/30 shadow-sm focus-visible:ring-[#8b4513] text-base md:text-lg"
                       />
                       <Button type="submit" disabled={isLoading}>
                         Add sighting
