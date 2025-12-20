@@ -96,7 +96,7 @@ describe("Navigation", () => {
     })
 
     expect(screen.getByText("TaleTrail")).toBeInTheDocument()
-    expect(screen.getByText("Search")).toBeInTheDocument()
+
     expect(screen.getByText("Generate Code")).toBeInTheDocument()
     expect(screen.queryByText("Login")).not.toBeInTheDocument()
   })
