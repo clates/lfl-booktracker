@@ -1,96 +1,30 @@
 "use client"
 
-import { zodResolver } from "@hookform/resolvers/zod"
-import { useForm } from "react-hook-form"
-import * as z from "zod"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form"
-import { useEffect, useState } from "react"
-import { GenerateBookCodeRequest } from "@/lib/types"
+import { useState, useEffect } from "react"
+import { ParchmentFrame } from "@/components/ui/parchment-frame"
+import { GoogleBookSearch } from "@/components/google-book-search"
 import { useToast } from "@/hooks/use-toast"
 import useLocation from "@/hooks/use-location"
-import { OpenLibraryDoc, getBookCover } from "@/lib/openLibrary"
-import AutoCompleteResults from "@/components/autoCompleteResults"
-import { Accordion } from "@/components/ui/accordion"
-
-const formSchema = z.object({
-  location: z.string().min(2, "Location must be at least 2 characters"),
-  author: z.string().min(2, "Author must be at least 2 characters"),
-  title: z.string().min(2, "Title must be at least 2 characters"),
-  lat: z.string().min(2, "Title must be at least 2 characters"),
-  long: z.string().min(2, "Title must be at least 2 characters"),
-  isbn: z.string().min(2, "ISBN must be at least 8 characters"),
-})
+import { Loader2 } from "lucide-react"
 
 export default function GeneratePage() {
+  const [selectedBook, setSelectedBook] = useState<{
+    title: string
+    authors?: string[]
+    coverUrl?: string
+  } | null>(null)
+
   const [generatedCode, setGeneratedCode] = useState<string>("")
-  const [isLoading, setIsLoading] = useState(false)
+  const [isGenerating, setIsGenerating] = useState(false)
   const { toast } = useToast()
-  const { latitude, longitude, error } = useLocation()
-  const [titleInput, setTitleInput] = useState<string>("")
-  const [isbnInput, setIsbnInput] = useState<string>("")
-  const [titleResults, setTitleResults] = useState<any[]>([])
-  const [selectedBook, setSelectedBook] = useState<OpenLibraryDoc | null>(null)
+  const { latitude, longitude } = useLocation()
 
-  /**
-   * AutoComplete when typing in the title field.
-   * This will fetch results from the OpenLibrary API and display them in a list.
-   */
-  useEffect(() => {
-    const fetchResults = async () => {
-      let searchCriteria = ""
-      if (titleInput.length >= 6) {
-        searchCriteria = `title=${titleInput}*`
-      } else if (isbnInput.length >= 8) {
-        searchCriteria = `isbn=${isbnInput}*`
-      }
-      try {
-        const response = await fetch(
-          `https://openlibrary.org/search.json?${searchCriteria}&fields=title,author_name,cover_i,isbn,ratings_count,cover_edition_key&limit=20`
-        )
-        const data: { docs: OpenLibraryDoc[] } = await response.json()
-        setTitleResults(data.docs.sort((a, b) => a.ratings_count - b.ratings_count) || [])
-      } catch (fetchError) {
-        console.error("Error fetching data:", fetchError)
-      }
-    }
-
-    // Debounce the API call by setting a timer
-    const debounceTimer = setTimeout(() => {
-      if (titleInput.length >= 6 || isbnInput.length >= 8) {
-        // Adjust this condition as needed
-        fetchResults()
-      } else {
-        setTitleResults([])
-      }
-    }, 300) // Delay in milliseconds
-
-    return () => clearTimeout(debounceTimer) // Cleanup the timer
-  }, [titleInput, isbnInput])
-
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      author: "",
-      title: "",
-      isbn: "",
-    },
-  })
-
-  // Helper to get cookie
   function getCookie(name: string) {
+    if (typeof document === "undefined") return null
     const value = `; ${document.cookie}`
     const parts = value.split(`; ${name}=`)
     if (parts.length === 2) return parts.pop()?.split(";").shift()
+    return null
   }
 
   useEffect(() => {
@@ -101,10 +35,22 @@ export default function GeneratePage() {
     }
   }, [])
 
-  async function onSubmit() {
-    setIsLoading(true)
+  async function handleGenerate() {
+    if (!selectedBook) return
+
+    if (!latitude || !longitude) {
+      toast({
+        title: "Location Required",
+        description: "We need your location to generate a code.",
+        variant: "destructive",
+      })
+      return
+    }
+
+    setIsGenerating(true)
     try {
-      const anonymousId = getCookie("lfl_anonymous_id")
+      // Get anonymous ID if exists
+      const anonymousId = getCookie("anonymousId")
       const response = await fetch("/api/books/generate", {
         method: "POST",
         headers: {
@@ -113,31 +59,32 @@ export default function GeneratePage() {
         body: JSON.stringify({
           book: selectedBook,
           location: {
-            lat: latitude ? latitude : 0,
-            long: longitude ? longitude : 0,
+            lat: latitude,
+            long: longitude,
           },
           anonymousId,
-        } as GenerateBookCodeRequest),
+        }),
       })
 
       if (!response.ok) {
-        throw new Error("Failed to record hit")
+        throw new Error("Failed to generate code")
       }
 
       const { code } = await response.json()
       setGeneratedCode(code)
       toast({
         title: "Success",
-        description: "ID Generated Successfully",
+        description: "Book code generated successfully!",
       })
     } catch (error) {
+      console.error(error)
       toast({
         title: "Error",
         description: "Failed to generate ID. Please try again.",
         variant: "destructive",
       })
     } finally {
-      setIsLoading(false)
+      setIsGenerating(false)
     }
   }
 
@@ -147,120 +94,110 @@ export default function GeneratePage() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-2xl">
-      <Card className="bg-accent">
-        <CardHeader>
-          <CardTitle>Generate Book Code</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-              <FormField
-                control={form.control}
-                name="title"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Title</FormLabel>
-                    <FormControl>
-                      <div>
-                        <Input
-                          placeholder="Enter title"
-                          {...field}
-                          onChange={(e) => {
-                            setTitleInput(e.target.value)
-                            field.onChange(e)
-                          }}
-                          onFocus={(e) => {
-                            setTitleInput(e.target.value)
-                          }}
-                        />
-                        <AutoCompleteResults
-                          results={titleInput ? titleResults : []}
-                          onSelect={(book) => {
-                            setTitleResults([])
-                            setSelectedBook(book)
-                          }}
-                        />
-                      </div>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="isbn"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>ISBN</FormLabel>
-                    <FormControl>
-                      <div>
-                        <Input
-                          placeholder="Enter ISBN"
-                          {...field}
-                          onChange={(e) => {
-                            setIsbnInput(e.target.value)
-                            field.onChange(e)
-                          }}
-                          onFocus={(e) => {
-                            setTitleInput(e.target.value)
-                          }}
-                        />
-                        <AutoCompleteResults
-                          results={isbnInput ? titleResults : []}
-                          onSelect={(book) => {
-                            setTitleResults([])
-                            setSelectedBook(book)
-                          }}
-                        />
-                      </div>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </form>
-          </Form>
-        </CardContent>
-      </Card>
-      {selectedBook && (
-        <Card className="bg-accent mt-6">
-          <CardHeader>
-            <CardTitle>Selected Book</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex flex-col gap-3">
-              <div className="flex flex-row justify-around gap-1">
-                <div className="flex flex-col gap-1">
-                  <h3 className="text-lg text-accent-foreground">{selectedBook.title}</h3>
-                  <p className="text-md text-muted-foreground">
-                    {selectedBook.author_name?.join(", ")}
-                  </p>
+    <>
+      <div
+        className="fixed inset-0 -z-10 opacity-25 blur-[1px]"
+        style={{
+          backgroundImage: "url('/images/background/lfl-background-edited.png')",
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+        }}
+      />
 
-                  {selectedBook.isbn && (
-                    <p className="text-md text-muted-foreground">ISBN: {selectedBook.isbn[0]}</p>
-                  )}
+      <main className="container mx-auto px-4 py-8 min-h-screen flex flex-col items-center justify-center">
+        <div className="w-full max-w-4xl space-y-8">
+          <div className="text-center space-y-4">
+            <h1 className="font-serif text-4xl font-bold tracking-tighter sm:text-5xl text-primary">
+              Start a Journey
+            </h1>
+            <p className="text-muted-foreground text-lg italic font-serif max-w-2xl mx-auto">
+              Search for your book, generate a unique tracking code, and write it on the inside
+              cover before releasing it into the wild.
+            </p>
+          </div>
+
+          <ParchmentFrame variant="wavy" className="w-full max-w-3xl mx-auto">
+            {!generatedCode ? (
+              <div className="space-y-8">
+                <div className="space-y-4">
+                  <h2 className="font-serif text-2xl font-bold text-center text-primary">
+                    Select Your Book
+                  </h2>
+                  <GoogleBookSearch
+                    onSelect={(book) => {
+                      setSelectedBook(book)
+                    }}
+                  />
                 </div>
-                {
-                  // Display the book cover
-                  selectedBook.cover_edition_key && (
-                    <img src={getBookCover(selectedBook)} className="w-40 h-40" />
-                  )
-                }
+
+                {selectedBook && (
+                  <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                    <div className="flex gap-6 p-4 bg-muted/30 rounded-lg border border-primary/10">
+                      {selectedBook.coverUrl && (
+                        <img
+                          src={selectedBook.coverUrl}
+                          alt={selectedBook.title}
+                          className="w-24 h-36 object-cover rounded shadow-md"
+                        />
+                      )}
+                      <div className="space-y-2">
+                        <h3 className="font-serif text-xl font-semibold">{selectedBook.title}</h3>
+                        <p className="text-muted-foreground">{selectedBook.authors?.join(", ")}</p>
+                      </div>
+                    </div>
+
+                    <div className="flex justify-center">
+                      <button
+                        onClick={handleGenerate}
+                        disabled={isGenerating || !latitude}
+                        className="px-8 py-3 bg-primary text-primary-foreground font-serif text-lg rounded-full shadow-lg hover:shadow-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                      >
+                        {isGenerating ? (
+                          <>
+                            <Loader2 className="h-5 w-5 animate-spin" />
+                            Forging Code...
+                          </>
+                        ) : !latitude ? (
+                          "Waiting for Location..."
+                        ) : (
+                          "Generate Tracking Code"
+                        )}
+                      </button>
+                    </div>
+                  </div>
+                )}
               </div>
-              <Button type="submit" onClick={onSubmit} className="w-full">
-                Generate Code
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-      )}
-      {generatedCode && (
-        <div className="mt-6 p-4 bg-muted rounded-lg">
-          <p className="text-sm font-medium text-muted-foreground mb-2">Generated Code:</p>
-          <p className="text-3xl font-mono text-center">{formatCode(generatedCode)}</p>
+            ) : (
+              <div className="space-y-8 text-center animate-in zoom-in-95 duration-500">
+                <div className="space-y-4">
+                  <h2 className="font-serif text-2xl font-bold text-primary">
+                    Your Book is Ready!
+                  </h2>
+                  <p className="text-muted-foreground">
+                    Write this code clearly on the inside cover of your book:
+                  </p>
+                </div>
+
+                <div className="py-8 px-6 bg-muted/50 rounded-xl border-2 border-dashed border-primary/20">
+                  <p className="font-mono text-4xl sm:text-5xl font-bold tracking-widest text-primary select-all">
+                    {formatCode(generatedCode)}
+                  </p>
+                </div>
+
+                <button
+                  onClick={() => {
+                    setGeneratedCode("")
+                    setSelectedBook(null)
+                  }}
+                  className="text-muted-foreground hover:text-primary underline underline-offset-4 transition-colors"
+                >
+                  Register another book
+                </button>
+              </div>
+            )}
+          </ParchmentFrame>
         </div>
-      )}
-    </div>
+      </main>
+    </>
   )
 }

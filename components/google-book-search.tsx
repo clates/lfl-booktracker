@@ -19,7 +19,7 @@ interface GoogleBook {
 }
 
 interface GoogleBookSearchProps {
-  onSelect?: (book: { title: string; coverUrl?: string }) => void
+  onSelect?: (book: { title: string; authors?: string[]; coverUrl?: string }) => void
 }
 
 export function GoogleBookSearch({ onSelect }: GoogleBookSearchProps) {
@@ -65,6 +65,7 @@ export function GoogleBookSearch({ onSelect }: GoogleBookSearchProps) {
   const handleSelect = (book: GoogleBook) => {
     const payload = {
       title: book.volumeInfo.title,
+      authors: book.volumeInfo.authors,
       coverUrl: book.volumeInfo.imageLinks?.thumbnail,
     }
 

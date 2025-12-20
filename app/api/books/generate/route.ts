@@ -4,7 +4,9 @@ import { generateBookId } from "@/lib/id_generator"
 import { createRouteHandlerClient } from "@supabase/auth-helpers-nextjs"
 import { cookies } from "next/headers"
 import { createClient } from "@supabase/supabase-js"
+import { parseBookMetadata } from "@/lib/book-utils"
 import { OpenLibraryDoc, getBookCover } from "@/lib/openLibrary"
+import { BookMetadata } from "@/lib/types"
 
 export const dynamic = "force-dynamic"
 
@@ -40,9 +42,16 @@ export async function POST(request: Request) {
     })
 
     // 4. Prepare Metadata
-    const typedBook = book as OpenLibraryDoc
-    const cover_url = typedBook ? getBookCover(typedBook) : null
-    const isbn = typedBook?.isbn ? typedBook.isbn[0] : null
+    // The 'book' object might be an OpenLibraryDoc or a GoogleBookData object
+    const bookData = book as BookMetadata
+
+    // Parse metadata using helper to handle different formats safely
+    const { title, author, cover_url: cover_link, isbn } = parseBookMetadata(bookData)
+
+    if (!title || title === "Unknown Title") {
+      console.error("Attempted to generate book with no title", bookData)
+      return NextResponse.json({ error: "Book title is required" }, { status: 400 })
+    }
 
     // 5. Persist Book
     const { data, error } = await adminSupabase
@@ -51,10 +60,10 @@ export async function POST(request: Request) {
         code,
         lat,
         lon: long,
-        title: typedBook?.title || "Unknown Title",
-        author: typedBook?.author_name?.[0] || "Unknown Author",
+        title: title,
+        author: author,
         isbn: isbn,
-        cover_url: cover_url,
+        cover_url: cover_link,
         location: `${lat},${long}`,
       })
       .select()
@@ -91,3 +100,5 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Failed to create code" }, { status: 500 })
   }
 }
+
+// Helper moved to @/lib/book-utils

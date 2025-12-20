@@ -28,7 +28,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   const cookieStore = await cookies()
   // Ensure we use the ANON key for client operations to respect RLS
   const supabase = createServerComponentClient(
-    // @ts-expect-error - The library expects a Promise based on types but the implementation is synchronous
+    // @ts-expect-error - @supabase/auth-helpers-nextjs types are outdated for Next.js 15+ async cookies, but runtime expects sync object
     { cookies: () => cookieStore },
     {
       supabaseUrl: process.env.NEXT_PUBLIC_SUPABASE_URL,
