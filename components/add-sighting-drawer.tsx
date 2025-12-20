@@ -30,19 +30,19 @@ export function AddSightingDrawer() {
   const [generatedCode, setGeneratedCode] = useState<string>("")
   const [isGenerating, setIsGenerating] = useState(false)
   const { toast } = useToast()
-  const { latitude, longitude, error: locationError } = useLocation()
+  const { latitude, longitude, error: locationError, refetch: refetchLocation } = useLocation()
   const [locationTimeout, setLocationTimeout] = useState(false)
 
   // Handle location timeout and errors
   useEffect(() => {
     // If we have location or explicit error, no need to wait
-    if (latitude || locationError) {
+    if (latitude !== null || locationError) {
       setLocationTimeout(false)
       return
     }
 
     // Only start timeout if drawer is open and we don't have location yet
-    if (open && !latitude && !locationError) {
+    if (open && latitude === null && !locationError) {
       const timer = setTimeout(() => {
         setLocationTimeout(true)
         toast({
@@ -77,14 +77,12 @@ export function AddSightingDrawer() {
   async function handleGenerate() {
     if (!selectedBook) return
 
-    if (!latitude || !longitude) {
+    if (latitude === null || longitude === null) {
       // If we timed out or have an error, explain why again
       if (locationTimeout || locationError) {
-        toast({
-          title: "Location Access Required",
-          description: "Please enable location services to generate a code.",
-          variant: "destructive",
-        })
+        refetchLocation()
+        setLocationTimeout(false) // Reset timeout state to show loading again
+        return
       } else {
         toast({
           title: "Location Required",
@@ -208,7 +206,9 @@ export function AddSightingDrawer() {
 
                       <Button
                         onClick={handleGenerate}
-                        disabled={isGenerating || (!latitude && !locationError && !locationTimeout)}
+                        disabled={
+                          isGenerating || (latitude === null && !locationError && !locationTimeout)
+                        }
                         className="w-full font-serif text-lg shadow-md"
                         size="lg"
                       >
@@ -217,9 +217,9 @@ export function AddSightingDrawer() {
                             <Loader2 className="mr-2 h-5 w-5 animate-spin" />
                             Forging Code...
                           </>
-                        ) : !latitude ? (
+                        ) : latitude === null ? (
                           locationError || locationTimeout ? (
-                            "Location Access Required"
+                            "Retry Location Access"
                           ) : (
                             <>
                               <MapPin className="mr-2 h-5 w-5 animate-pulse" />
