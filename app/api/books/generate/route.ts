@@ -4,7 +4,9 @@ import { generateBookId } from "@/lib/id_generator"
 import { createRouteHandlerClient } from "@supabase/auth-helpers-nextjs"
 import { cookies } from "next/headers"
 import { createClient } from "@supabase/supabase-js"
+import { parseBookMetadata } from "@/lib/book-utils"
 import { OpenLibraryDoc, getBookCover } from "@/lib/openLibrary"
+import { BookMetadata } from "@/lib/types"
 
 export const dynamic = "force-dynamic"
 
@@ -40,29 +42,17 @@ export async function POST(request: Request) {
     })
 
     // 4. Prepare Metadata
-    // 4. Prepare Metadata
-    // The 'book' object might be an OpenLibraryDoc or a generic object from GoogleBookSearch
-    const bookData = book as any; 
-    
-    const title = bookData.title || "Unknown Title";
-    
-    // Handle authors: could be 'authors' (Google) or 'author_name' (OpenLibrary) or just 'author'
-    let author = "Unknown Author";
-    if (Array.isArray(bookData.authors) && bookData.authors.length > 0) {
-        author = bookData.authors.join(", ");
-    } else if (Array.isArray(bookData.author_name) && bookData.author_name.length > 0) {
-        author = bookData.author_name[0]; // Keep first author for consistency with old behavior
-    } else if (typeof bookData.author === 'string') {
-        author = bookData.author;
-    }
+    // The 'book' object might be an OpenLibraryDoc or a GoogleBookData object
+    const bookData = book as BookMetadata
 
-    // Handle cover: use direct url or generate from OLID
-    let cover_link = bookData.coverUrl || bookData.cover_url;
-    if (!cover_link && bookData.cover_edition_key) {
-        cover_link = getBookCover(bookData);
-    }
+    // Parse metadata using helper to handle different formats safely
+    const { title, author, cover_url: cover_link, isbn } = parseBookMetadata(bookData)
 
-    const isbn = bookData.isbn ? (Array.isArray(bookData.isbn) ? bookData.isbn[0] : bookData.isbn) : null;
+    if (!title || title === "Unknown Title") {
+      console.warn("Attempted to generate book with no title", bookData)
+      // We can iterate on this: define if text "Unknown Title" is acceptable.
+      // For now, allow it but log it. If stringent validation is needed, throw error.
+    }
 
     // 5. Persist Book
     const { data, error } = await adminSupabase
@@ -75,7 +65,7 @@ export async function POST(request: Request) {
         author: author,
         isbn: isbn,
         cover_url: cover_link,
-        location: `${lat},${long}` 
+        location: `${lat},${long}`,
       })
       .select()
       .single()
@@ -111,3 +101,5 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Failed to create code" }, { status: 500 })
   }
 }
+
+// Helper moved to @/lib/book-utils

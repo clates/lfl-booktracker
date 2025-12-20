@@ -28,8 +28,20 @@ export type Sighting = {
   }
 }
 
+// Google Books API / Component format
+export type GoogleBookData = {
+  title: string
+  authors?: string[]
+  coverUrl?: string
+  isbn?: string
+  googleId?: string
+}
+
+// Union type for the API input
+export type BookMetadata = OpenLibraryDoc | GoogleBookData
+
 export type GenerateBookCodeRequest = {
-  book: OpenLibraryDoc
+  book: BookMetadata
   location: { lat: string | number; long: string | number }
   anonymousId?: string
 }
