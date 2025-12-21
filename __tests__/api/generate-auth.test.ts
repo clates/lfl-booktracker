@@ -41,6 +41,10 @@ jest.mock("@/lib/book-utils", () => ({
     })),
 }))
 
+jest.mock("@/lib/location-utils", () => ({
+    getWhimsicalLocation: jest.fn().mockResolvedValue("Mock Town"),
+}))
+
 describe("Generate API Auth", () => {
     const mockCookies = {
         getAll: jest.fn(),
@@ -101,6 +105,7 @@ describe("Generate API Auth", () => {
                 anonymousId: "anon-123",
             }),
             url: "http://localhost/api/books/generate",
+            headers: new Headers(),
         } as unknown as Request
 
         await POST(request)
@@ -131,6 +136,7 @@ describe("Generate API Auth", () => {
                 anonymousId: "anon-123",
             }),
             url: "http://localhost/api/books/generate",
+            headers: new Headers(),
         } as unknown as Request
 
         await POST(request)

@@ -28,6 +28,13 @@ jest.mock("@supabase/auth-helpers-nextjs", () => ({
       getSession: jest.fn().mockResolvedValue({ data: { session: null } }),
       getUser: jest.fn().mockResolvedValue({ data: { user: null } }),
     },
+    from: jest.fn().mockReturnValue({
+      insert: jest.fn().mockReturnValue({
+        select: jest.fn().mockReturnValue({
+          single: jest.fn().mockResolvedValue({ data: { id: "test-id" }, error: null }),
+        }),
+      }),
+    }),
   }),
 }))
 
@@ -47,6 +54,7 @@ jest.mock("@/lib/id_generator", () => ({
   generateBookId: jest.fn().mockResolvedValue("TEST-CODE"),
 }))
 
+
 jest.mock("@/lib/book-utils", () => ({
   parseBookMetadata: jest.fn().mockReturnValue({
     title: "Test Title",
@@ -54,6 +62,10 @@ jest.mock("@/lib/book-utils", () => ({
     cover_url: "http://test.com/cover.jpg",
     isbn: "1234567890",
   }),
+}))
+
+jest.mock("@/lib/location-utils", () => ({
+  getWhimsicalLocation: jest.fn().mockResolvedValue("Mock Town"),
 }))
 
 describe("POST /api/books/generate", () => {
