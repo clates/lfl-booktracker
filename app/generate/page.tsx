@@ -88,11 +88,6 @@ export default function GeneratePage() {
     }
   }
 
-  // Format the code into ###-###-### format
-  function formatCode(code: string) {
-    return `${code.slice(0, 4)}-${code.slice(4, 6)}-${code.slice(6, 9)}`.toUpperCase()
-  }
-
   return (
     <>
       <div
@@ -180,7 +175,7 @@ export default function GeneratePage() {
 
                 <div className="py-8 px-6 bg-muted/50 rounded-xl border-2 border-dashed border-primary/20">
                   <p className="font-mono text-4xl sm:text-5xl font-bold tracking-widest text-primary select-all">
-                    {formatCode(generatedCode)}
+                    {generatedCode}
                   </p>
                 </div>
 
