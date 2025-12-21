@@ -9,6 +9,9 @@ if (typeof global.Request === "undefined") {
     constructor(input, init) {
       return { url: input, input, init, json: () => Promise.resolve({}) }
     }
+    static json(data) {
+      return { json: () => Promise.resolve(data) }
+    }
   }
 }
 
@@ -23,6 +26,15 @@ if (typeof global.Response === "undefined") {
         headers: {
           get: (key) => init?.headers?.[key] || null,
         },
+        json: () => Promise.resolve(body),
+      }
+    }
+    static json(body, init) {
+      return {
+        body,
+        init,
+        ok: true,
+        status: init?.status || 200,
         json: () => Promise.resolve(body),
       }
     }

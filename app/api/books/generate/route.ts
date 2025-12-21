@@ -24,10 +24,10 @@ export async function POST(request: Request) {
     const cookieStore = await cookies()
     const supabase = createRouteHandlerClient({ cookies: () => cookieStore } as any)
     const {
-      data: { session },
-    } = await supabase.auth.getSession()
+      data: { user },
+    } = await supabase.auth.getUser()
 
-    const userId = session?.user?.id || null
+    const userId = user?.id || null
 
     // 2. Generate Code
     const code = await generateBookId(lat, long)

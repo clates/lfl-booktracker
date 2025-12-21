@@ -44,6 +44,11 @@ describe("POST /api/sightings/claim", () => {
             },
           },
         }),
+        getUser: jest.fn().mockResolvedValue({
+          data: {
+            user: { id: "test-user-id" },
+          },
+        }),
       },
     }
     ;(createRouteHandlerClient as jest.Mock).mockReturnValue(mockSupabase)
@@ -76,6 +81,10 @@ describe("POST /api/sightings/claim", () => {
 
   it("should return 401 if user is not authenticated", async () => {
     mockSupabase.auth.getSession.mockResolvedValue({ data: { session: null } })
+    mockSupabase.auth.getUser.mockResolvedValue({
+      data: { user: null },
+      error: new Error("Auth Error"),
+    })
     const request = new Request("http://localhost:3000/api/sightings/claim", {
       method: "POST",
       body: JSON.stringify({ anonymousId: "123e4567-e89b-12d3-a456-426614174000" }),
