@@ -26,6 +26,7 @@ jest.mock("@supabase/auth-helpers-nextjs", () => ({
   createRouteHandlerClient: jest.fn().mockReturnValue({
     auth: {
       getSession: jest.fn().mockResolvedValue({ data: { session: null } }),
+      getUser: jest.fn().mockResolvedValue({ data: { user: null } }),
     },
   }),
 }))

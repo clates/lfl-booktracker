@@ -19,13 +19,10 @@ export async function POST(request: Request) {
     // 1. Get authenticated user
     const cookieStore = await cookies()
     // Use ANON_KEY for session handling (respects RLS)
-    const supabase = createRouteHandlerClient(
-      { cookies: () => cookieStore },
-      {
-        supabaseUrl: process.env.NEXT_PUBLIC_SUPABASE_URL,
-        supabaseKey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
-      }
-    )
+    const supabase = createRouteHandlerClient({ cookies: () => cookieStore } as any, {
+      supabaseUrl: process.env.NEXT_PUBLIC_SUPABASE_URL,
+      supabaseKey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+    })
     const {
       data: { user },
     } = await supabase.auth.getUser()

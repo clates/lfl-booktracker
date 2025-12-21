@@ -40,6 +40,11 @@ This document serves as the primary context and rulebook for all AI agents worki
 - **Supabase:** PostgreSQL database and Authentication.
 - **Database Logic:** Relational data (Books <-> Sightings <-> Users).
 
+### Package Management
+
+- **Tool:** `yarn` (NOT `npm`).
+- **Enforcement:** All install/run commands should use `yarn`.
+
 ## Key Mechanics
 
 ### 1. Oldest-to-Newest Ledger
