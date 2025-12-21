@@ -17,7 +17,7 @@ export async function POST(request: Request) {
     }
 
     // 1. Get authenticated user
-    const cookieStore = cookies()
+    const cookieStore = await cookies()
     // Use ANON_KEY for session handling (respects RLS)
     const supabase = createRouteHandlerClient(
       { cookies: () => cookieStore },
@@ -27,14 +27,14 @@ export async function POST(request: Request) {
       }
     )
     const {
-      data: { session },
-    } = await supabase.auth.getSession()
+      data: { user },
+    } = await supabase.auth.getUser()
 
-    if (!session?.user) {
+    if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
-    const userId = session.user.id
+    const userId = user.id
 
     // 2. Claim sightings using centralized Admin Client
     // 3. Update sightings
