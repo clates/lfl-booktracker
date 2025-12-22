@@ -11,7 +11,7 @@ export async function getWhimsicalLocation(lat: number, lon: number): Promise<st
       {
         headers: {
           // Nominatim requires a User-Agent.
-          "User-Agent": "LFL-BookTracker/1.0",
+          "User-Agent": "TaleTrail/1.0 (taletrail.org / taletrail@chrislates.com)",
         },
         next: {
           // Cache for a long time to avoid rate limits on known coords
