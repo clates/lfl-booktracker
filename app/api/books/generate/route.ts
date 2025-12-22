@@ -7,6 +7,7 @@ import { createClient } from "@supabase/supabase-js"
 import { parseBookMetadata } from "@/lib/book-utils"
 import { OpenLibraryDoc, getBookCover } from "@/lib/openLibrary"
 import { BookMetadata } from "@/lib/types"
+import { getWhimsicalLocation } from "@/lib/location-utils"
 
 export const dynamic = "force-dynamic"
 
@@ -32,14 +33,8 @@ export async function POST(request: Request) {
     // 2. Generate Code
     const code = await generateBookId(lat, long)
 
-    // 3. Initialize Admin Client for persistence (bypassing RLS for anonymous inserts)
-    // Use DB_KEY as the service role key
-    const adminSupabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.DB_KEY!, {
-      auth: {
-        persistSession: false,
-        autoRefreshToken: false,
-      },
-    })
+    // 3. (Admin Client already imported as adminSupabase)
+    // Removed local initialization that used incorrect key.
 
     // 4. Prepare Metadata
     // The 'book' object might be an OpenLibraryDoc or a GoogleBookData object
@@ -54,7 +49,10 @@ export async function POST(request: Request) {
     }
 
     // 5. Persist Book
-    const { data, error } = await adminSupabase
+    // 5. Persist Book (Using mapped client to respect RLS)
+    const whimsicalLocation = await getWhimsicalLocation(lat, long)
+
+    const { data, error } = await supabase
       .from("books")
       .insert({
         code,
@@ -64,7 +62,7 @@ export async function POST(request: Request) {
         author: author,
         isbn: isbn,
         cover_url: cover_link,
-        location: `${lat},${long}`,
+        location: whimsicalLocation,
       })
       .select()
       .single()
@@ -75,11 +73,11 @@ export async function POST(request: Request) {
     }
 
     // 4. Create Initial Sighting
-    const { error: sightingError } = await adminSupabase.from("sightings").insert({
+    const { error: sightingError } = await supabase.from("sightings").insert({
       book_id: data.id,
       lat,
       lon: long,
-      location: `${lat},${long}`,
+      location: whimsicalLocation,
       sighting_type: "REGISTER",
       // If user is logged in, associate with them. Otherwise anonymous.
       user_id: userId,

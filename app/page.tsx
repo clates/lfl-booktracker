@@ -65,8 +65,10 @@ export default async function Home() {
   const sightings = rawSightings.map((sighting) => {
     if (sighting.user_id && usersMap.has(sighting.user_id)) {
       const fullEmail = usersMap.get(sighting.user_id) || ""
-      // Security: Mask the email server-side, only exposing the username part.
-      const maskedEmail = fullEmail.split("@")[0]
+      // Security: Obfuscate the email server-side.
+      // Format: first 3 chars + ... + last 3 chars of username.
+      const username = fullEmail.split("@")[0]
+      const maskedEmail = `${username.slice(0, 3)}...${username.slice(-3)}`
       return {
         ...sighting,
         user: {
