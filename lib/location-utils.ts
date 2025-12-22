@@ -7,7 +7,7 @@
 export async function getWhimsicalLocation(lat: number, lon: number): Promise<string> {
   try {
     const res = await fetch(
-      `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&zoom=10`,
+      `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&zoom=14`,
       {
         headers: {
           // Nominatim requires a User-Agent.
@@ -22,25 +22,33 @@ export async function getWhimsicalLocation(lat: number, lon: number): Promise<st
 
     if (!res.ok) {
       console.warn("Nominatim API Error:", res.status, res.statusText)
-      return `${lat.toFixed(2)}, ${lon.toFixed(2)}`
+      return "The Wilds"
     }
 
     const data = await res.json()
+    const addr = data.address || {}
 
-    // Extract just the suburb, neighborhood, or town as requested
-    // Fallback to "The Wilds" if nothing specific found, or coordinate-ish hint
-    const name =
-      data.address?.suburb ||
-      data.address?.town ||
-      data.address?.city ||
-      data.address?.village ||
-      data.address?.county ||
-      "The Wilds"
+    // Extract relevant parts
+    const neighbourhood = addr.neighbourhood || addr.suburb || addr.quarter
+    const city = addr.town || addr.city || addr.village || addr.municipality 
+    const county = addr.county
+    
+    // Format: "Near [Neighbourhood] in [City]" or just "[City]"
+    let name = "The Wilds"
+
+    if (neighbourhood && city) {
+      name = `Near ${neighbourhood} in ${city}`
+    } else if (neighbourhood) {
+      name = `Near ${neighbourhood}`
+    } else if (city) {
+      name = city
+    } else if (county) {
+      name = county
+    }
 
     return name
   } catch (error) {
     console.error("Failed to fetch whimsical location:", error)
-    // Fallback to simplified coordinates
-    return `${lat.toFixed(2)}, ${lon.toFixed(2)}`
+    return "The Wilds"
   }
 }
