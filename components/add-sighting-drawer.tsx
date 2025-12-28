@@ -237,10 +237,6 @@ export function AddSightingDrawer() {
               ) : (
                 <div className="space-y-6 text-center animate-in zoom-in-95 duration-500 py-2">
                   <BookStickerInstruction code={generatedCode} coverUrl={selectedBook?.coverUrl} />
-
-                  <Button variant="outline" onClick={resetState} className="mt-2">
-                    Register another book
-                  </Button>
                 </div>
               )}
             </ParchmentFrame>

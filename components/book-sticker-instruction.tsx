@@ -13,6 +13,17 @@ interface BookStickerInstructionProps {
   code: string
   coverUrl?: string
   className?: string
+  animationSpeedMultiplier?: number
+}
+
+// Animation Configuration
+const ANIMATION_BASE_DURATION_S = 2.5
+// Derived timings
+const ANIMATION_CONFIG = {
+  duration: ANIMATION_BASE_DURATION_S,
+  openDelay: ANIMATION_BASE_DURATION_S * 0.3, // ~0.5s if base is 2.5
+  urlWriteDelay: ANIMATION_BASE_DURATION_S * 0.28, // Starts shortly after page flip starts? No, originally 0.2 which is small.
+  codeWriteDelay: 1.0, // 1.2 - 0.2, relative to URL finishing
 }
 
 const TypewriterText = ({
@@ -76,20 +87,24 @@ const TypewriterText = ({
 export function BookStickerInstruction({ code, coverUrl, className }: BookStickerInstructionProps) {
   const [copied, setCopied] = useState(false)
   const [isOpen, setIsOpen] = useState(false)
+  const [aspectRatio, setAspectRatio] = useState(1 / 1.3)
+
+  // Refined plan: Use a ref or state for style.
+  const [dynamicAspectRatio, setDynamicAspectRatio] = useState(1.3)
 
   useEffect(() => {
     // Open the book shortly after mount
     const timer = setTimeout(() => {
       setIsOpen(true)
-    }, 500)
+    }, ANIMATION_CONFIG.openDelay * 1000)
 
     return () => clearTimeout(timer)
   }, [])
 
   useEffect(() => {
     if (isOpen) {
-      // Trigger confetti when book opens and ink dries (approx 2s delay total relative to open)
-      // Let's time it with the code writing completion
+      const confettiDelayMs = (ANIMATION_CONFIG.duration + 1.0) * 1000
+
       const confettiTimer = setTimeout(() => {
         const end = Date.now() + 1000
         const colors = ["#a8e6cf", "#dcedc1", "#ffd3b6", "#ffaaa5", "#ff8b94"]
@@ -114,7 +129,7 @@ export function BookStickerInstruction({ code, coverUrl, className }: BookSticke
             requestAnimationFrame(frame)
           }
         })()
-      }, 2500) // Delay to match writing animation
+      }, confettiDelayMs)
 
       return () => clearTimeout(confettiTimer)
     }
@@ -135,7 +150,7 @@ export function BookStickerInstruction({ code, coverUrl, className }: BookSticke
     <div className={cn("relative w-full max-w-md mx-auto p-4 perspective-[1200px]", className)}>
       <div className="flex gap-2 items-center justify-center relative">
         {/* The 3D Book Container */}
-        <div className="relative w-full aspect-[1.3] mt-4 mb-2 max-w-[300px]">
+        <div className="relative w-auto h-[275px] mt-4 mb-2 max-w-[300px] aspect-[0.66]">
           {/* The Book Itself */}
           <motion.div
             className="relative w-full h-full preserve-3d origin-left"
@@ -144,7 +159,7 @@ export function BookStickerInstruction({ code, coverUrl, className }: BookSticke
               rotateY: isOpen ? -10 : 0,
               x: isOpen ? "100%" : "0%",
             }}
-            transition={{ duration: 1.5, ease: "easeInOut" }}
+            transition={{ duration: ANIMATION_CONFIG.duration, ease: "easeInOut" }}
           >
             {/* RIGHT PAGE (The "Book Block" that stays underneath) */}
             <div className="absolute inset-0 w-full h-full bg-[#fdfbf6] rounded-r-md shadow-lg border-l border-stone-200">
@@ -163,7 +178,12 @@ export function BookStickerInstruction({ code, coverUrl, className }: BookSticke
               animate={{
                 rotateY: isOpen ? -180 : 0,
               }}
-              transition={{ duration: 1.5, type: "spring", stiffness: 40, damping: 12 }}
+              transition={{
+                duration: ANIMATION_CONFIG.duration,
+                type: "spring",
+                stiffness: 40,
+                damping: 12,
+              }}
               onUpdate={(latest) => {
                 // Track rotation to toggle visibility state at 90 degrees (halfway)
                 if (typeof latest.rotateY === "number") {
@@ -184,7 +204,13 @@ export function BookStickerInstruction({ code, coverUrl, className }: BookSticke
                     <img
                       src={coverUrl}
                       alt="Book Cover"
-                      className="w-full h-full opacity-90 mix-blend-overlay"
+                      className="h-full opacity-90 mix-blend-overlay aspect-2/3"
+                      onLoad={(e) => {
+                        const img = e.currentTarget
+                        if (img.naturalWidth && img.naturalHeight) {
+                          setDynamicAspectRatio(img.naturalWidth / img.naturalHeight)
+                        }
+                      }}
                     />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center bg-amber-700 text-amber-100 p-6 text-center">
@@ -221,7 +247,7 @@ export function BookStickerInstruction({ code, coverUrl, className }: BookSticke
                         <div className="h-4 flex items-center justify-center">
                           <TypewriterText
                             text="TaleTrail.org"
-                            delay={0.2} // Reduced delay since we wait for the page flip now
+                            delay={ANIMATION_CONFIG.urlWriteDelay}
                             className="font-handwriting font-bold text-amber-800 tracking-wide text-xl"
                           />
                         </div>
@@ -234,7 +260,9 @@ export function BookStickerInstruction({ code, coverUrl, className }: BookSticke
                           <div className="font-handwriting text-2xl font-bold text-stone-800 tracking-widest border-2 border-dashed border-stone-300 rounded px-3 py-1 bg-white/50 min-w-[160px] min-h-[48px] flex items-center justify-center">
                             <TypewriterText
                               text={code}
-                              delay={1.2} // Relative to the URL finishing
+                              delay={
+                                ANIMATION_CONFIG.urlWriteDelay + ANIMATION_CONFIG.codeWriteDelay
+                              }
                             />
                           </div>
 
