@@ -18,6 +18,7 @@ import { GoogleBookSearch } from "@/components/google-book-search"
 import { ParchmentFrame } from "@/components/ui/parchment-frame"
 import { useToast } from "@/hooks/use-toast"
 import useLocation from "@/hooks/use-location"
+import { BookStickerInstruction } from "@/components/book-sticker-instruction"
 
 export function AddSightingDrawer() {
   const [open, setOpen] = useState(false)
@@ -235,20 +236,7 @@ export function AddSightingDrawer() {
                 </div>
               ) : (
                 <div className="space-y-6 text-center animate-in zoom-in-95 duration-500 py-2">
-                  <div className="space-y-2">
-                    <h2 className="font-serif text-xl font-bold text-primary">
-                      Ready for Adventure!
-                    </h2>
-                    <p className="text-sm text-muted-foreground">
-                      Write this code on the inside cover:
-                    </p>
-                  </div>
-
-                  <div className="py-6 px-4 bg-white/50 rounded-lg border-2 border-dashed border-primary/20 backdrop-blur-sm">
-                    <p className="font-mono text-3xl font-bold tracking-widest text-primary select-all">
-                      {generatedCode}
-                    </p>
-                  </div>
+                  <BookStickerInstruction code={generatedCode} coverUrl={selectedBook?.coverUrl} />
 
                   <Button variant="outline" onClick={resetState} className="mt-2">
                     Register another book

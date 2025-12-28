@@ -1,6 +1,6 @@
 import "./globals.css"
 import type { Metadata } from "next"
-import { Inter, Crimson_Text } from "next/font/google"
+import { Inter, Crimson_Text, Caveat } from "next/font/google"
 import { Toaster } from "@/components/ui/toaster"
 import { ThemeProvider } from "@/components/theme-provider"
 import { ParchmentFilters } from "@/components/ui/parchment-filters"
@@ -15,6 +15,10 @@ const crimson = Crimson_Text({
   weight: ["400", "600", "700"],
   subsets: ["latin"],
   variable: "--font-serif",
+})
+const caveat = Caveat({
+  subsets: ["latin"],
+  variable: "--font-handwriting",
 })
 
 export const metadata: Metadata = {
@@ -49,7 +53,10 @@ export default async function RootLayout({ children }: { children: React.ReactNo
 
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${inter.variable} ${crimson.variable} font-sans`}>
+      <body
+        className={`${inter.variable} ${crimson.variable} ${caveat.variable} font-sans`}
+        suppressHydrationWarning
+      >
         <ParchmentFilters />
         <ThemeProvider
           attribute="class"
