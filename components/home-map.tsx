@@ -70,7 +70,7 @@ export default function HomeMap({ sightings }: HomeMapProps) {
       >
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-          url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png"
+          url="https://tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
         <MapUpdater center={flyToCenter} />
         {sightings.map((sighting) => {
